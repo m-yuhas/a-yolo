@@ -7,6 +7,8 @@ from PL_Modules.build_detection import build_model
 from PL_Modules.pl_detection import LitDetection
 
 
+import torch #MJY Jan 3, needed for saving model at train end
+
 def main():
     args = train_argument_parser().parse_args()
 
@@ -52,12 +54,13 @@ def main():
     if not args.test:
         lightning = LitDetection(model, model_cfgs, data_cfgs)
         trainer.fit(lightning, datamodule=data)
+        torch.save(lightning.model, f'{args.experiment_name}.pt') #MJY Jan 3 save model after train
     else:
         test_cfgs = {'visualize': args.visualize, 'test_nms': args.nms, 'test_conf': args.conf,
                      'show_dir': args.show_dir, 'show_score_thr': args.show_score_thr}
         lightning = LitDetection(model, model_cfgs, data_cfgs, test_cfgs)
         trainer.test(lightning, datamodule=data,
-                     ckpt_path='F:\论文\毕业论文\实验\pl_yolo\AL6\YOLOX-l-mixup1.0-epoch=249-mAP=0.744.ckpt')
+                     ckpt_path=args.ckpt) #MJY Jan 3 don't hardcode checkpoint path
 
     # trainer.tune(lightning, datamodule=data)
     # trainer.validate(lightning, datamodule=data, ckpt_path='weights/al6/epoch=399-mAP=0.774.ckpt')

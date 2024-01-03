@@ -3,6 +3,7 @@ import torch.nn as nn
 from models.backbones.darknet_csp import CSPDarkNet
 from models.backbones.mobilenext_csp import CSPMobileNext
 from models.backbones.eelan import EELAN
+from models.backbones.eelan_full import EELANFull
 from models.backbones.ecmnet import ECMNet
 from models.backbones.shufflenetv2 import ShuffleNetV2_Plus
 from models.backbones.mobilenetv3 import MobileNetV3_Small, MobileNetV3_Large
@@ -68,6 +69,9 @@ def eelan(cfg):
     backbone = EELAN(cfg['depths'], cfg['channels'], cfg['outputs'], cfg['norm'], cfg['act'])
     return backbone
 
+def eelan_full(cfg):
+    backbone = EELANFull(cfg['depths'], cfg['channels'], cfg['outputs'], cfg['norm'], cfg['act'])
+    return backbone
 
 def ecmnet(cfg):
     backbone = ECMNet(cfg['depths'], cfg['channels'], cfg['outputs'], cfg['norm'], cfg['act'])
