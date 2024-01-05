@@ -10,7 +10,7 @@ from utils.flops import model_summary
 from models.evaluators.postprocess import postprocess, format_outputs
 from models.evaluators.eval_coco import COCOEvaluator
 from models.evaluators.eval_voc import VOCEvaluator
-from utils.visualize_images import COCOVisualization
+#from utils.visualize_images import COCOVisualization
 
 
 class LitDetection(LightningModule):
@@ -150,5 +150,5 @@ class LitDetection(LightningModule):
         average_nms_time = torch.tensor(self.nms_times, dtype=torch.float32).mean().item()
         print("The average iference time is %.4fs, nms time is %.4fs" % (average_ifer_time, average_nms_time))
         # visualization
-        if self.visualize:
-            COCOVisualization(json_list, self.trainer.datamodule.dataset_test, out_dir=self.show_dir)
+        #if self.visualize:
+        #    COCOVisualization(json_list, self.trainer.datamodule.dataset_test, out_dir=self.show_dir)

@@ -8,6 +8,7 @@ Depths and Channels
 """
 
 import torch
+import pytorch_lightning
 from torch import nn
 from models.layers.network_blocks import BaseConv, SPPBottleneck
 
@@ -20,7 +21,7 @@ class EELANFull(pytorch_lightning.LightningModule):
         self,
         depths=(4, 4, 4, 4),
         channels=(64, 128, 256, 512, 1024),
-        out_features=("block1", "block2", "block3"),
+        out_features=("block2", "block3", "block4"),
         norm='bn',
         act="silu",
     ):
