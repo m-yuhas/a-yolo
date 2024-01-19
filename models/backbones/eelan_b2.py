@@ -13,7 +13,7 @@ from torch import nn
 from models.layers.network_blocks import BaseConv, SPPBottleneck
 
 
-class EELANFull(pytorch_lightning.LightningModule):
+class EELANBlock2(pytorch_lightning.LightningModule):
     """
     Extended efficient layer aggregation networks (EELAN)
     """
@@ -24,6 +24,7 @@ class EELANFull(pytorch_lightning.LightningModule):
         out_features=("block2", "block3", "block4"),
         norm='bn',
         act="silu",
+        weights="",
     ):
         super().__init__()
 
@@ -31,50 +32,64 @@ class EELANFull(pytorch_lightning.LightningModule):
         assert out_features, "please provide output features of EELAN!"
         self.out_features = out_features
 
+        #base_model = torch.load(weights, map_location=torch.device('cuda:0'))
+        base_model = torch.load(weights)
+
         # stem
-        self.stem = nn.Sequential(
-            BaseConv(3, 32, 3, 1, norm=norm, act=act),
-            BaseConv(32, channels[0], 3, 2, norm=norm, act=act),
-            BaseConv(channels[0], channels[0], 3, 1, norm=norm, act=act),
-        )
+        self.stem = base_model.backbone.stem
+        for l in self.stem:
+            l.freeze()
+            l.to(self.device)
+        self.stem_exit0 = Transition(channels[0], mpk=2, norm=norm, act=act)
+        self.stem_exit = Transition(channels[0], mpk=2, norm=norm, act=act)
 
         # block1
-        self.stage1 = nn.Sequential(
-            BaseConv(channels[0], channels[1], 3, 2, norm=norm, act=act),
-            CSPLayer(channels[1], channels[2], expansion=0.5, num_bottle=depths[0], norm=norm, act=act),
-        )
+        self.block1 = base_model.backbone.block1
+        for l in self.block1:
+            l.freeze()
+            l.to(self.device)
+        self.block1_exit0 = base_model.backbone.block1_exit
+        self.block1_exit0.freeze()
+        self.block1_exit0.to(self.device)
+        #for l in self.block1_exit0:
+        #    l.freeze()
+        #    l.to(self.device)
+        self.block1_exit = Transition(channels[2], mpk=2, norm=norm, act=act)
+
 
         # block2
-        self.stage2 = nn.Sequential(
-            Transition(channels[2], mpk=2, norm=norm, act=act),
-            CSPLayer(channels[2], channels[3], expansion=0.5, num_bottle=depths[1], norm=norm, act=act),
-        )
+        self.block2 = base_model.backbone.block2
+        for l in self.block2:
+            l.freeze()
+            l.to(self.device)
+        self.block2_exit0 = base_model.backbone.block2_exit
+        self.block1_exit0.freeze()
+        self.block1_exit0.to(self.device)
+        #for l in self.block2_exit0:
+        #    l.freeze()
+        #    l.to(self.device)
+        self.block2_exit = Transition(channels[3], mpk=2, norm=norm, act=act)
 
         # block3
-        self.stage3 = nn.Sequential(
-            Transition(channels[3], mpk=2, norm=norm, act=act),
-            CSPLayer(channels[3], channels[4], expansion=0.5, num_bottle=depths[2], norm=norm, act=act),
-        )
+        #self.block3 = base_model.backbone.stage3
+        #for l in self.block3:
+        #    l.freeze()
+        #    l.to(self.device)
 
-        # block4
-        self.stage4 = nn.Sequential(
-            Transition(channels[4], mpk=2, norm=norm, act=act),
-            SPPBottleneck(channels[4], channels[4], norm=norm, act=act),
-            CSPLayer(channels[4], channels[4], expansion=0.5, num_bottle=depths[3], norm=norm, act=act),
-        )
+        #self.block3_exit = Transition(channels[4], mpk=2, norm=norm, act=act)
+
 
     def forward(self, x):
         outputs = {}
         x = self.stem(x)
         outputs["stem"] = x
-        x = self.stage1(x)
+        outputs["stem_exit"] = self.stem_exit(self.stem_exit0(x))
+        x = self.block1(x)
         outputs["block1"] = x
-        x = self.stage2(x)
+        outputs["block1_exit"] = self.block1_exit(self.block1_exit0(x))
+        x = self.block2(x)
         outputs["block2"] = x
-        x = self.stage3(x)
-        outputs["block3"] = x
-        x = self.stage4(x)
-        outputs["block4"] = x
+        outputs["block2_exit"] = self.block2_exit(self.block2_exit0(x))
         if len(self.out_features) <= 1:
             return x
         return [v for k, v in outputs.items() if k in self.out_features]

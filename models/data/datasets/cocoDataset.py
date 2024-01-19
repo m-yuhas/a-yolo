@@ -73,6 +73,12 @@ class COCODataset(Dataset):
             img, target = self.preprocess(img, res, self.img_size)
         else:
             target = res
+        #print(f"IMG: {img.shape}")
+        #print(f"TARGET: {target}")
+        #print(f"IMGHW: {img_hw}")
+        #print(f"INFO_IMG: {np.array([id_])}")
+        #print(f"IMG_ID: {img_name}")
+
         return img, target, img_hw, np.array([id_]), img_name
 
     def _load_coco_annotations(self):

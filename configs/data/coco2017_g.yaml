@@ -3,7 +3,7 @@ name: COCO2017
 datamodule: 'coco'
 
 dataset:
-    dir: '/mnt/sda/Datasets/Coco/'
+    dir: '/mnt/7fad4474-58d9-48d4-a565-db321fc0cca5/michaelj004/Coco2017/'
     train: 'train2017'  # directory name of training image
     train_json: 'annotations/instances_train2017.json'
     val: 'val2017'
@@ -12,8 +12,8 @@ dataset:
     test_json: 'annotations/test.json'
     train_size: [224,224]  # [224,224] [416,416] [640,640]
     val_size: [224,224]
-    train_batch_size: 32
-    val_batch_size: 32
+    train_batch_size: 128
+    val_batch_size: 128
 
 transform:
     # Train transform
