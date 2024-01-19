@@ -24,6 +24,7 @@ class EELANBlock3(pytorch_lightning.LightningModule):
         out_features=("block2", "block3", "block4"),
         norm='bn',
         act="silu",
+        weights="",
     ):
         super().__init__()
 
@@ -31,50 +32,60 @@ class EELANBlock3(pytorch_lightning.LightningModule):
         assert out_features, "please provide output features of EELAN!"
         self.out_features = out_features
 
+        #base_model = torch.load(weights, map_location=torch.device('cuda:0'))
         base_model = torch.load(weights)
 
         # stem
         self.stem = base_model.backbone.stem
         for l in self.stem:
-            l.freeeze()
-            l._should_prevent_trainer_and_dataloaders_deepcopy = False
+            l.freeze()
+            l.to(self.device)
 
         # block1
         self.block1 = base_model.backbone.stage1
         for l in self.block1:
             l.freeze()
-            l._should_prevent_trainer_and_dataloaders_deepcopy = False
+            l.to(self.device)
+
+        self.block1_exit = Transition(channels[2], mpk=2, norm=norm, act=act)
 
 
         # block2
         self.block2 = base_model.backbone.stage2
         for l in self.block2:
             l.freeze()
-            l._should_prevent_trainer_and_dataloaders_deepcopy = False
+            l.to(self.device)
+
+        self.block2_exit = Transition(channels[3], mpk=2, norm=norm, act=act)
 
         # block3
         self.block3 = base_model.backbone.stage3
         for l in self.block3:
             l.freeze()
-            l._should_prevent_trainer_and_dataloaders_deepcopy = False
+            l.to(self.device)
+
+        self.block3_exit = Transition(channels[4], mpk=2, norm=norm, act=act)
 
 
     def forward(self, x):
         outputs = {}
         x = self.stem(x)
         outputs["stem"] = x
-        x = self.stage1(x)
+        x = self.block1(x)
         outputs["block1"] = x
-        x = self.stage2(x)
+        outputs["block1_exit"] = self.block1_exit(x)
+        x = self.block2(x)
         outputs["block2"] = x
-        x = self.stage3(x)
+        outputs["block2_exit"] = self.block2_exit(x)
+        x = self.block3(x)
         outputs["block3"] = x
+        outputs["block3_exit"] = self.block3_exit(x)
         if len(self.out_features) <= 1:
             return x
         return [v for k, v in outputs.items() if k in self.out_features]
 
 
-class CSPLayer(nn.Module):
+class CSPLayer(pytorch_lightning.LightningModule):
     def __init__(
         self,
         in_channel,
@@ -118,7 +129,7 @@ class CSPLayer(nn.Module):
         return self.conv5(x)
 
 
-class Transition(nn.Module):
+class Transition(pytorch_lightning.LightningModule):
     def __init__(self, in_channel, mpk=2, norm='bn', act="silu"):
         super(Transition, self).__init__()
         self.mp = nn.MaxPool2d(kernel_size=mpk, stride=mpk)

@@ -3,8 +3,9 @@ import torch.nn as nn
 from .activation import get_activation
 from .normalization import get_normalization
 
+import pytorch_lightning
 
-class BaseConv(nn.Module):
+class BaseConv(pytorch_lightning.LightningModule):
     """A Convolution2d -> Normalization -> Activation"""
     def __init__(
         self, in_channels, out_channels, ksize, stride, padding=None, groups=1, bias=False, norm="bn", act="silu"
@@ -40,7 +41,7 @@ class BaseConv(nn.Module):
         return self.act(self.conv(x))
 
 
-class Focus(nn.Module):
+class Focus(pytorch_lightning.LightningModule):
     """Focus width and height information into channel space."""
 
     def __init__(self, in_channels, out_channels, ksize=1, stride=1, norm='bn', act="silu"):
@@ -65,7 +66,7 @@ class Focus(nn.Module):
         return self.conv(x)
 
 
-class Bottleneck(nn.Module):
+class Bottleneck(pytorch_lightning.LightningModule):
     # Standard bottleneck from ResNet
     def __init__(
         self,
@@ -91,7 +92,7 @@ class Bottleneck(nn.Module):
         return y
 
 
-class CSPLayer(nn.Module):
+class CSPLayer(pytorch_lightning.LightningModule):
     def __init__(
         self,
         in_channels,
@@ -131,7 +132,7 @@ class CSPLayer(nn.Module):
         return self.conv3(x)
 
 
-class SPPBottleneck(nn.Module):
+class SPPBottleneck(pytorch_lightning.LightningModule):
     """Spatial pyramid pooling layer used in YOLOv3-SPP"""
     def __init__(
         self, in_channels, out_channels, kernel_sizes=(5, 9, 13), norm='bn', act="silu"
@@ -155,7 +156,7 @@ class SPPBottleneck(nn.Module):
         return x
 
 
-class SPPCSPC(nn.Module):
+class SPPCSPC(pytorch_lightning.LightningModule):
     # CSP https://github.com/WongKinYiu/CrossStagePartialNetworks
     def __init__(self, c1, c2, k=(5, 9, 13)):
         super(SPPCSPC, self).__init__()

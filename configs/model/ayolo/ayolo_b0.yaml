@@ -1,16 +1,16 @@
 backbone:
-    name: eelan_b3
+    name: eelan_b0
     depths: [4,4,4]
     channels: [64,128,256,512, 1024] # five blocks
-    outputs: [ "block1_exit", "block2_exit", "block3_exit" ]
+    outputs: [ "stem_exit" ]
     norm: bn
     act: silu
-    weights: ayolo_full_kitti_640.pt 
+    weights: ayolo_b1_kitti_640.pt 
 
 neck:
-    name: yolov7neck
+    name: yolov7neck1
     depths: [4,4,4,4]
-    channels: [256, 512, 1024]
+    channels: [64, 256, 512]
     norm: bn
     act: silu
 
@@ -18,17 +18,15 @@ head:
     name: implicit_head
     num_class: 6
     num_anchor: 3
-    channels: [256, 512, 1024]
+    channels: [128]
     norm: bn
     act: silu
 
 loss:
     name: yolov7
     num_class: 6
-    stride: [8,16,32]
+    stride: [32]
     anchors:
-        - [ [ 12,16 ], [ 19,36 ], [ 40,28 ] ]  # P3/8
-        - [ [ 36,75 ], [ 76,55 ], [ 72,146 ] ]  # P4/16
         - [ [ 142,110 ], [ 192,243 ], [ 459,401 ] ]  # P5/32
 
 optimizer:
