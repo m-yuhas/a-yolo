@@ -28,6 +28,7 @@ def main():
         mode="max",
         filename='{epoch:02d}-{mAP:.3f}',
     )
+
     trainer = Trainer(
         accelerator="gpu",
         devices=1,
@@ -71,7 +72,6 @@ def main():
         lightning = LitDetection(model, model_cfgs, data_cfgs, test_cfgs)
         lightning.to(torch.device('cpu'))
         trainer.test(lightning, datamodule=data) #,
-                     #ckpt_path=args.ckpt) #MJY Jan 3 don't hardcode checkpoint path
 
     # trainer.tune(lightning, datamodule=data)
     # trainer.validate(lightning, datamodule=data, ckpt_path='weights/al6/epoch=399-mAP=0.774.ckpt')
