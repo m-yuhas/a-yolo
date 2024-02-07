@@ -1,0 +1,43 @@
+backbone:
+    name: vggnet
+    depths: [2, 2, 3, 3, 3]
+    channels: [64,128,256,512,512] # five blocks
+    outputs: [ "block3", "block4" ]
+    norm: bn
+    act: relu
+
+neck:
+    name: ssdneck
+    depths: [1024,512,256,128]
+    channels: [512, 512]
+    norm: bn
+    act: relu
+
+head:
+    name: ssdhead
+    num_class: 6
+    num_anchor: 6
+    channels: [512, 1024, 256, 128, 128, 128]
+    norm: bn
+    act: relu
+
+loss:
+    name: yolov7
+    num_class: 6
+    stride: [38, 19, 10, 5, 3, 1]  #TODO, calculate stride for all six heads + 4 anchors
+    anchors:
+        - [ [7,7], [10,5], [12,4], [5,10], [4,12], [8,8] ]  # P38/300
+        - [ [12,12], [17,8], [21,7], [8,17], [7, 21], [13,13] ]  # P19/300
+        - [ [19,19], [26,13], [32,10], [13,26], [10,32], [21,21] ]  # P10/300
+        - [ [29,29], [41,20], [50,17], [20,41], [17,50], [33,33] ] #P5/300
+        - [ [34,34], [48,24], [59,20], [24,48], [20,59], [40,40] ] #P3/300
+        - [ [60,60], [85,42], [104,35], [42,85], [35,104], [78,78] ] #P1/300
+
+optimizer:
+    name: "SGD"
+    learning_rate: 0.03
+    momentum: 0.9
+    weight_decay: 0.0005
+    lr_scheduler: "CosineWarmupScheduler"
+    warmup: 0.1
+    ema: False

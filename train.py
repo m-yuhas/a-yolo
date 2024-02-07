@@ -15,7 +15,6 @@ def main():
     data_cfgs = load_config(args.dataset)
     data = build_data(data_cfgs['datamodule'])
     data = data(data_cfgs)
-
     model_cfgs = load_config(args.model)
     model = build_model(model_cfgs, data_cfgs['num_classes'])
 
@@ -29,7 +28,6 @@ def main():
         mode="max",
         filename='{epoch:02d}-{mAP:.3f}',
     )
-
     trainer = Trainer(
         accelerator="gpu",
         devices=1,
@@ -50,7 +48,6 @@ def main():
         # limit_val_batches=40,
         # reload_dataloaders_every_n_epochs=10,
     )
-
     if not args.test:
         lightning = LitDetection(model, model_cfgs, data_cfgs)
         trainer.fit(lightning, datamodule=data)
@@ -58,9 +55,23 @@ def main():
     else:
         test_cfgs = {'visualize': args.visualize, 'test_nms': args.nms, 'test_conf': args.conf,
                      'show_dir': args.show_dir, 'show_score_thr': args.show_score_thr}
+        model = torch.load(args.ckpt, map_location=torch.device('cpu'))
+        #model.to(torch.device('cpu'))
+        trainer = Trainer(
+            accelerator="cpu",
+            devices=1,
+            max_epochs=1,
+            check_val_every_n_epoch=1,
+            log_every_n_steps=1,
+            enable_progress_bar=True,
+            logger=logger,
+            callbacks=[checkpoint_callback],
+        )
+
         lightning = LitDetection(model, model_cfgs, data_cfgs, test_cfgs)
-        trainer.test(lightning, datamodule=data,
-                     ckpt_path=args.ckpt) #MJY Jan 3 don't hardcode checkpoint path
+        lightning.to(torch.device('cpu'))
+        trainer.test(lightning, datamodule=data) #,
+                     #ckpt_path=args.ckpt) #MJY Jan 3 don't hardcode checkpoint path
 
     # trainer.tune(lightning, datamodule=data)
     # trainer.validate(lightning, datamodule=data, ckpt_path='weights/al6/epoch=399-mAP=0.774.ckpt')

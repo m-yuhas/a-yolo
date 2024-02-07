@@ -1,0 +1,135 @@
+backbone:
+  act: relu
+  channels:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 512
+  depths:
+  - 2
+  - 2
+  - 3
+  - 3
+  - 3
+  name: vggnet
+  norm: bn
+  outputs:
+  - block3
+  - block4
+head:
+  act: relu
+  channels:
+  - 512
+  - 1024
+  - 256
+  - 128
+  - 128
+  - 128
+  name: ssdhead
+  norm: bn
+  num_anchor: 6
+  num_class: 6
+loss:
+  anchors:
+  - - - 7
+      - 7
+    - - 10
+      - 5
+    - - 12
+      - 4
+    - - 5
+      - 10
+    - - 4
+      - 12
+    - - 8
+      - 8
+  - - - 12
+      - 12
+    - - 17
+      - 8
+    - - 21
+      - 7
+    - - 8
+      - 17
+    - - 7
+      - 21
+    - - 13
+      - 13
+  - - - 19
+      - 19
+    - - 26
+      - 13
+    - - 32
+      - 10
+    - - 13
+      - 26
+    - - 10
+      - 32
+    - - 21
+      - 21
+  - - - 29
+      - 29
+    - - 41
+      - 20
+    - - 50
+      - 17
+    - - 20
+      - 41
+    - - 17
+      - 50
+    - - 33
+      - 33
+  - - - 34
+      - 34
+    - - 48
+      - 24
+    - - 59
+      - 20
+    - - 24
+      - 48
+    - - 20
+      - 59
+    - - 40
+      - 40
+  - - - 60
+      - 60
+    - - 85
+      - 42
+    - - 104
+      - 35
+    - - 42
+      - 85
+    - - 35
+      - 104
+    - - 78
+      - 78
+  name: yolov7
+  num_class: 6
+  stride:
+  - 38
+  - 19
+  - 10
+  - 5
+  - 3
+  - 1
+neck:
+  act: relu
+  channels:
+  - 512
+  - 512
+  depths:
+  - 1024
+  - 512
+  - 256
+  - 128
+  name: ssdneck
+  norm: bn
+optimizer:
+  ema: false
+  learning_rate: 0.03
+  lr_scheduler: CosineWarmupScheduler
+  momentum: 0.9
+  name: SGD
+  warmup: 0.1
+  weight_decay: 0.0005

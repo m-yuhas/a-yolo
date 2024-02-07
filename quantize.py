@@ -74,7 +74,8 @@ class YoloBlock2(torch.nn.Module):
         # HEAD
         self.head = base_model.head
 
-    def forward(self, b1, se1, b1e0, b1e1):
+    def forward(self, x):
+        b1, se1, b1e0, b1e1 = x
         b2 = self.block2(b1)
         b2e0 = self.block2_exit0(b2)
         b2e1 = self.block2_exit1(b2e0)
@@ -98,7 +99,8 @@ class YoloBlock3(torch.nn.Module):
         # HEAD
         self.head = base_model.head
 
-    def forward(self, b2, b1e0, b2e0):
+    def forward(self, x):
+        b2, b1e0, b2e0 = x
         b3 = self.block3(b2)
         b3e0 = self.block3_exit0(b3)
         
@@ -114,7 +116,8 @@ class YoloBlock4(torch.nn.Module):
         self.neck = base_model.neck
         self.head = base_model.head
 
-    def forward(self, b2, b3):
+    def forward(self, x):
+        b2, b3 = x
         b4 = self.block4(b3)
         y = self.neck((b2, b3, b4))
         det0, det1, det2 = self.head(y)
@@ -149,14 +152,14 @@ def block1_to_tf(block: torch.nn.Module, name: str, dummy_input: Tuple[int]):
 
 def block2_to_tf(block: torch.nn.Module, name: str, dummy_input: Tuple[int]):
     block.eval()
-    det0, det1, det2, b2, b1e0, b2e0 = block(dummy_input[0], dummy_input[1], dummy_input[2], dummy_input[3])
+    det0, det1, det2, b2, b1e0, b2e0 = block(dummy_input)
     torch.onnx.export(
         block,                          # PyTorch Model
         [torch.rand(dummy_input[i].shape) for i in range(len(dummy_input))],  # Input tensor
         name + ".onnx",                 # Output file (eg. 'output_model.onnx')
         opset_version=14,               # Operator support version
-        input_names=['b1', 'se1', 'b1e0', 'b1e1'],              # Input tensor name (arbitary)
-        output_names=['det0', 'det1', 'det2', 'b2', 'b1e0', 'b2e0']      # Output tensor name (arbitary)
+        input_names=['b1in', 'se1in', 'b1e0in', 'b1e1in'],              # Input tensor name (arbitary)
+        output_names=['det0', 'det1', 'det2', 'b2out', 'b1e0out', 'b2e0out']      # Output tensor name (arbitary)
     )
     onnx_model = onnx.load(name + ".onnx")
     tf_rep = prepare(onnx_model)
@@ -165,14 +168,14 @@ def block2_to_tf(block: torch.nn.Module, name: str, dummy_input: Tuple[int]):
 
 def block3_to_tf(block: torch.nn.Module, name: str, dummy_input: Tuple[int]):
     block.eval()
-    det0, det1, det2, b2, b3 = block(dummy_input[0], dummy_input[1], dummy_input[2])
+    det0, det1, det2, b2, b3 = block(dummy_input)
     torch.onnx.export(
         block,                          # PyTorch Model
         [torch.rand(dummy_input[i].shape) for i in range(len(dummy_input))],  # Input tensor
         name + ".onnx",                 # Output file (eg. 'output_model.onnx')
         opset_version=14,               # Operator support version
-        input_names=['b2', 'b1e0', 'b2e0'],              # Input tensor name (arbitary)
-        output_names=['det0', 'det1', 'det2', 'b2', 'b3']      # Output tensor name (arbitary)
+        input_names=['b2in', 'b1e0in', 'b2e0in'],              # Input tensor name (arbitary)
+        output_names=['det0', 'det1', 'det2', 'b2out', 'b3out']      # Output tensor name (arbitary)
     )
     onnx_model = onnx.load(name + ".onnx")
     tf_rep = prepare(onnx_model)
@@ -181,13 +184,13 @@ def block3_to_tf(block: torch.nn.Module, name: str, dummy_input: Tuple[int]):
 
 def block4_to_tf(block: torch.nn.Module, name: str, dummy_input: Tuple[int]):
     block.eval()
-    det0, det1, det2 = block(dummy_input[0], dummy_input[1], dummy_input[2])
+    det0, det1, det2 = block(dummy_input)
     torch.onnx.export(
         block,
         [torch.rand(dummy_input[i].shape) for i in range(len(dummy_input))],
         name + ".onnx",
         opset_version=14,
-        input_names=['b2', 'b3'],
+        input_names=['b2in', 'b3in'],
         output_names=['det0', 'det1', 'det2']
     )
     onnx_model = onnx.load(name + ".onnx")
@@ -200,33 +203,37 @@ def calibration_set(path: str, model_blocks: List[torch.nn.Module], stop_block: 
     def rep_set():
         transform=torchvision.transforms.Compose([
             torchvision.transforms.ToTensor(),
-            torchvision.transforms.Resize((224, 224), antialias=False)
+            torchvision.transforms.Resize((640, 640), antialias=False)
         ])
         for c in os.listdir(path):
             for f in os.listdir(os.path.join(path, c)):
+                if not (f.endswith('.png') or f.endswith('.jpg')):
+                    continue
                 x = Image.open(os.path.join(path, c, f)).convert('RGB')
                 x = transform(x)
                 x = x.unsqueeze(0)
                 if stop_block == 0:
-                    x = x.detach().numpy().astype(numpy.float32)
-                    yield [x]
+                    r0 = x.detach().numpy().astype(numpy.float32)
+                    yield [r0]
                 _, _, b1, se1, b1e0, b1e1 = model_blocks[0](x)
-                b1 = b1.detach().numpy().astype(numpy.float32)
-                se1 = se1.detach().numpy().astype(numpy.float32)
-                b1e1 = b1e1.detach().numpy().astype(numpy.float32)
                 if stop_block == 1:
-                    yield [b1, se1, b1e1]
-                _, _, _, b2, b1e0, b2e0 = model_blocks[1](b1, se1, b1e1)
-                b2 = b2.detach().numpy().astype(numpy.float32)
-                b1e0 = b1e0.detach().numpy().astype(numpy.float32)
-                b2e1 = b2e0.detach().numpy().astype(numpy.float32)
+                    r0 = b1.detach().numpy().astype(numpy.float32)
+                    r1 = se1.detach().numpy().astype(numpy.float32)
+                    r2 = b1e0.detach().numpy().astype(numpy.float32)
+                    r3 = b1e1.detach().numpy().astype(numpy.float32)
+                    #yield [r0, r1, r2, r3]
+                    yield [r3, r2, r1, r0]
+                _, _, _, b2, b1e0, b2e0 = model_blocks[1]((b1, se1, b1e0, b1e1))
                 if stop_block == 2:
-                    yield [b2, b1e0, b2e1]
-                _, _, _, b2, b3 = model_blocks[2](b2, b1e0, b2e1)
-                b2 = b2.detach().numpy().astype(numpy.float32)
-                b3 = b3.detach().numpy().astype(numpy.float32)
+                    r0 = b2.detach().numpy().astype(numpy.float32)
+                    r1 = b1e0.detach().numpy().astype(numpy.float32)
+                    r2 = b2e0.detach().numpy().astype(numpy.float32)
+                    yield [r0, r1, r2]
+                _, _, _, b2, b3 = model_blocks[2]((b2, b1e0, b2e0))
                 if stop_block == 3:
-                    yield [b2, b3]
+                    r0 = b2.detach().numpy().astype(numpy.float32)
+                    r1 = b3.detach().numpy().astype(numpy.float32)
+                    yield [r0, r1]
     return rep_set
 
 
@@ -252,22 +259,22 @@ def static_quantize(block1: str, block2: str, block3: str, block4, calset: str) 
     print(f'### Working on block 1... ###')
     torch.save(blocks[0].state_dict(), f'yolov7block1_sd.pt')
     dummy_input = block1_to_tf(blocks[0], f'yolov7block1', dummy_input)
-    tf_to_tfliteq(f'yolov7block1', calibration_set(calset, blocks, 1))       
+    tf_to_tfliteq(f'yolov7block1', calibration_set(calset, blocks, 0))       
         
     print(f'### Working on block 2... ###')
     torch.save(blocks[1].state_dict(), f'yolov7block2_sd.pt')
-    dummy_input = block2_to_tf(blocks[1], f'yolov7block2', dummy_input[0])
-    tf_to_tfliteq(f'yolov7block2', calibration_set(calset, blocks, 2))
+    dummy_input = block2_to_tf(blocks[1], f'yolov7block2', dummy_input)
+    tf_to_tfliteq(f'yolov7block2', calibration_set(calset, blocks, 1))
 
     print(f'### Working on block 3... ###')
     torch.save(blocks[2].state_dict(), f'yolov7block3_sd.pt')
-    block3_to_tf(blocks[2], f'yolov7block3', dummy_input[0], dummy_input[1])
-    tf_to_tfliteq(f'yolov7block3', calibration_set(calset, blocks, 3))
+    block3_to_tf(blocks[2], f'yolov7block3', dummy_input)
+    tf_to_tfliteq(f'yolov7block3', calibration_set(calset, blocks, 2))
 
     print(f'### Working on block 4... ###')
     torch.save(blocks[3].state_dict(), f'yolov7block4_sd.pt')
-    block3_to_tf(blocks[2], f'yolov7block4', dummy_input[0], dummy_input[1])
-    tf_to_tfliteq(f'yolov7block4', calibration_set(calset, blocks, 4))
+    block4_to_tf(blocks[3], f'yolov7block4', dummy_input)
+    tf_to_tfliteq(f'yolov7block4', calibration_set(calset, blocks, 3))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('Quantize a Beta-VAE model')

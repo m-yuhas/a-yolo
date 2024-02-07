@@ -18,6 +18,10 @@ class LitDetection(LightningModule):
     def __init__(self, model, model_cfgs, data_cfgs, test_cfgs=None):
         super().__init__()
         self.model = model
+        self.model.backbone.to(self.device)
+        self.model.neck.to(self.device)
+        self.model.head.to(self.device)
+        self.model.loss.to(self.device)
         # Parameters for training
         self.co = model_cfgs['optimizer']
         self.cd = data_cfgs['dataset']

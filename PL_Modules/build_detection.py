@@ -10,13 +10,16 @@ from models.backbones.shufflenetv2 import ShuffleNetV2_Plus
 from models.backbones.mobilenetv3 import MobileNetV3_Small, MobileNetV3_Large
 from models.backbones.vision_transformer.vision_transformer import VisionTransformer
 from models.backbones.vision_transformer.swin_transformer import SwinTransformer
+from models.backbones.vggnet import VGGNET
 # necks
 from models.necks.pafpn_csp import CSPPAFPN
 from models.necks.pafpn_al import AL_PAFPN
 from models.necks.yolov7_neck import YOLOv7NECK
+from models.necks.ssd_neck import SSDNECK
 # heads
 from models.heads.decoupled_head import DecoupledHead
 from models.heads.implicit_head import ImplicitHead
+from models.heads.ssd_head import SsdHead
 # loss
 from models.losses.yolox.yolox_loss import YOLOXLoss
 from models.losses.yolov7.yolov7_loss import YOLOv7Loss
@@ -78,6 +81,10 @@ def eelan_b3(cfg):
     backbone = EELANBlock3(cfg['depths'], cfg['channels'], cfg['outputs'], cfg['norm'], cfg['act'])
     return backbone
 
+def vggnet(cfg):
+    backbone = VGGNET(cfg['depths'], cfg['channels'], cfg['outputs'], cfg['norm'], cfg['act'])
+    return backbone
+
 def ecmnet(cfg):
     backbone = ECMNet(cfg['depths'], cfg['channels'], cfg['outputs'], cfg['norm'], cfg['act'])
     return backbone
@@ -126,6 +133,10 @@ def yolov7neck(cfg):
     neck = YOLOv7NECK(cfg['depths'], cfg['channels'], cfg['norm'], cfg['act'])
     return neck
 
+def ssdneck(cfg):
+    neck = SSDNECK(cfg['depths'], cfg['channels'], cfg['norm'], cfg['act'])
+    return neck
+
 
 def none(cfg):
     return None
@@ -139,6 +150,10 @@ def decoupled_head(cfg, num_classes):
 
 def implicit_head(cfg, num_classes):
     head = ImplicitHead(num_classes, cfg['num_anchor'], cfg['channels'])
+    return head
+
+def ssdhead(cfg, num_classes):
+    head = SsdHead(num_classes, cfg['num_anchor'], cfg['channels'])
     return head
 
 
