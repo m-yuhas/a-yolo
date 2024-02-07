@@ -74,8 +74,12 @@ class YoloBlock2(torch.nn.Module):
         # HEAD
         self.head = base_model.head
 
+<<<<<<< HEAD
     def forward(self, x):
         b1, se1, b1e0, b1e1 = x
+=======
+    def forward(self, b1, se1, b1e0, b1e1):
+>>>>>>> a3cc840dbfce3776d754b9d5d2a34f61790aa792
         b2 = self.block2(b1)
         b2e0 = self.block2_exit0(b2)
         b2e1 = self.block2_exit1(b2e0)
@@ -99,8 +103,12 @@ class YoloBlock3(torch.nn.Module):
         # HEAD
         self.head = base_model.head
 
+<<<<<<< HEAD
     def forward(self, x):
         b2, b1e0, b2e0 = x
+=======
+    def forward(self, b2, b1e0, b2e0):
+>>>>>>> a3cc840dbfce3776d754b9d5d2a34f61790aa792
         b3 = self.block3(b2)
         b3e0 = self.block3_exit0(b3)
         
@@ -116,8 +124,12 @@ class YoloBlock4(torch.nn.Module):
         self.neck = base_model.neck
         self.head = base_model.head
 
+<<<<<<< HEAD
     def forward(self, x):
         b2, b3 = x
+=======
+    def forward(self, b2, b3):
+>>>>>>> a3cc840dbfce3776d754b9d5d2a34f61790aa792
         b4 = self.block4(b3)
         y = self.neck((b2, b3, b4))
         det0, det1, det2 = self.head(y)
@@ -152,14 +164,23 @@ def block1_to_tf(block: torch.nn.Module, name: str, dummy_input: Tuple[int]):
 
 def block2_to_tf(block: torch.nn.Module, name: str, dummy_input: Tuple[int]):
     block.eval()
+<<<<<<< HEAD
     det0, det1, det2, b2, b1e0, b2e0 = block(dummy_input)
+=======
+    det0, det1, det2, b2, b1e0, b2e0 = block(dummy_input[0], dummy_input[1], dummy_input[2], dummy_input[3])
+>>>>>>> a3cc840dbfce3776d754b9d5d2a34f61790aa792
     torch.onnx.export(
         block,                          # PyTorch Model
         [torch.rand(dummy_input[i].shape) for i in range(len(dummy_input))],  # Input tensor
         name + ".onnx",                 # Output file (eg. 'output_model.onnx')
         opset_version=14,               # Operator support version
+<<<<<<< HEAD
         input_names=['b1in', 'se1in', 'b1e0in', 'b1e1in'],              # Input tensor name (arbitary)
         output_names=['det0', 'det1', 'det2', 'b2out', 'b1e0out', 'b2e0out']      # Output tensor name (arbitary)
+=======
+        input_names=['b1', 'se1', 'b1e0', 'b1e1'],              # Input tensor name (arbitary)
+        output_names=['det0', 'det1', 'det2', 'b2', 'b1e0', 'b2e0']      # Output tensor name (arbitary)
+>>>>>>> a3cc840dbfce3776d754b9d5d2a34f61790aa792
     )
     onnx_model = onnx.load(name + ".onnx")
     tf_rep = prepare(onnx_model)
@@ -168,14 +189,23 @@ def block2_to_tf(block: torch.nn.Module, name: str, dummy_input: Tuple[int]):
 
 def block3_to_tf(block: torch.nn.Module, name: str, dummy_input: Tuple[int]):
     block.eval()
+<<<<<<< HEAD
     det0, det1, det2, b2, b3 = block(dummy_input)
+=======
+    det0, det1, det2, b2, b3 = block(dummy_input[0], dummy_input[1], dummy_input[2])
+>>>>>>> a3cc840dbfce3776d754b9d5d2a34f61790aa792
     torch.onnx.export(
         block,                          # PyTorch Model
         [torch.rand(dummy_input[i].shape) for i in range(len(dummy_input))],  # Input tensor
         name + ".onnx",                 # Output file (eg. 'output_model.onnx')
         opset_version=14,               # Operator support version
+<<<<<<< HEAD
         input_names=['b2in', 'b1e0in', 'b2e0in'],              # Input tensor name (arbitary)
         output_names=['det0', 'det1', 'det2', 'b2out', 'b3out']      # Output tensor name (arbitary)
+=======
+        input_names=['b2', 'b1e0', 'b2e0'],              # Input tensor name (arbitary)
+        output_names=['det0', 'det1', 'det2', 'b2', 'b3']      # Output tensor name (arbitary)
+>>>>>>> a3cc840dbfce3776d754b9d5d2a34f61790aa792
     )
     onnx_model = onnx.load(name + ".onnx")
     tf_rep = prepare(onnx_model)
@@ -184,7 +214,7 @@ def block3_to_tf(block: torch.nn.Module, name: str, dummy_input: Tuple[int]):
 
 def block4_to_tf(block: torch.nn.Module, name: str, dummy_input: Tuple[int]):
     block.eval()
-    det0, det1, det2 = block(dummy_input)
+    det0, det1, det2 = block(dummy_input[0], dummy_input[1], dummy_input[2])
     torch.onnx.export(
         block,
         [torch.rand(dummy_input[i].shape) for i in range(len(dummy_input))],

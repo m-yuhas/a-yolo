@@ -10,16 +10,25 @@ from models.backbones.shufflenetv2 import ShuffleNetV2_Plus
 from models.backbones.mobilenetv3 import MobileNetV3_Small, MobileNetV3_Large
 from models.backbones.vision_transformer.vision_transformer import VisionTransformer
 from models.backbones.vision_transformer.swin_transformer import SwinTransformer
+<<<<<<< HEAD
 from models.backbones.vggnet import VGGNET
+=======
+>>>>>>> a3cc840dbfce3776d754b9d5d2a34f61790aa792
 # necks
 from models.necks.pafpn_csp import CSPPAFPN
 from models.necks.pafpn_al import AL_PAFPN
 from models.necks.yolov7_neck import YOLOv7NECK
+<<<<<<< HEAD
 from models.necks.ssd_neck import SSDNECK
 # heads
 from models.heads.decoupled_head import DecoupledHead
 from models.heads.implicit_head import ImplicitHead
 from models.heads.ssd_head import SsdHead
+=======
+# heads
+from models.heads.decoupled_head import DecoupledHead
+from models.heads.implicit_head import ImplicitHead
+>>>>>>> a3cc840dbfce3776d754b9d5d2a34f61790aa792
 # loss
 from models.losses.yolox.yolox_loss import YOLOXLoss
 from models.losses.yolov7.yolov7_loss import YOLOv7Loss
