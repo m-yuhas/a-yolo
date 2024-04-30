@@ -36,52 +36,53 @@ class EELANBlock1(pytorch_lightning.LightningModule):
         base_model = torch.load(weights)
 
         # stem
+        self.stem_q = base_model.backbone.stem_q
         self.stem = base_model.backbone.stem
         for l in self.stem:
             l.freeze()
             l.to(self.device)
+        self.stem_dq0 = base_model.backbone.stem_dq0
         self.stem_exit0 = base_model.backbone.stem_exit0
         self.stem_exit0.freeze()
         self.stem_exit0.to(self.device)
-        #for l in self.stem_exit0:
-        #    l.freeze()
-        #    l.to(self.device)
         self.stem_exit1 = base_model.backbone.stem_exit
         self.stem_exit1.freeze()
         self.stem_exit1.to(self.device)
-        #for l in self.stem_exit1:
-        #    l.freeze()
-        #    l.to(self.device)
+        self.stem_dq1 = base_model.backbone.stem_dq1
         self.stem_exit = Transition(channels[0], mpk=2, norm=norm, act=act)
+        self.stem_dq2 = torch.quantization.DeQuantStub()
 
         # block1
+        self.block1_q = base_model.backbone.block1_q
         self.block1 = base_model.backbone.block1
         for l in self.block1:
             l.freeze()
             l.to(self.device)
+        self.block1_dq0 = base_model.backbone.block1_dq0
         self.block1_exit0 = base_model.backbone.block1_exit0
         self.block1_exit0.freeze()
         self.block1_exit0.to(self.device)
-        #for l in self.block1_exit0:
-        #    l.freeze()
-        #    l.to(self.device)
+        self.block1_dq1 = base_model.backbone.block1_dq1
         self.block1_exit1 = base_model.backbone.block1_exit
         self.block1_exit1.freeze()
         self.block1_exit1.to(self.device)
-        #for l in self.block1_exit1:
-        #    l.freeze()
-        #    l.to(self.device)
+        self.block1_dq2 = base_model.backbone.block1_dq2
         self.block1_exit = Transition(channels[2], mpk=2, norm=norm, act=act)
+        self.block1_dq3 = torch.quantization.DeQuantStub()
 
 
     def forward(self, x):
         outputs = {}
+        x = self.stem_q(x)
         x = self.stem(x)
+        outputs["stem_exit"] = self.stem_dq2(self.stem_exit(self.stem_exit1(self.stem_exit0(x))))
+        x = self.stem_dq0(x)
         outputs["stem"] = x
-        outputs["stem_exit"] = self.stem_exit(self.stem_exit1(self.stem_exit0(x)))
+        x = self.block1_q(x)
         x = self.block1(x)
+        outputs["block1_exit"] = self.block1_dq3(self.block1_exit(self.block1_exit1(self.block1_exit0(x))))
+        x = self.block1_dq0(x)
         outputs["block1"] = x
-        outputs["block1_exit"] = self.block1_exit(self.block1_exit1(self.block1_exit0(x)))
         if len(self.out_features) <= 1:
             return x
         return [v for k, v in outputs.items() if k in self.out_features]

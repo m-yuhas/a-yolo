@@ -36,33 +36,36 @@ class EELANBlock0(pytorch_lightning.LightningModule):
         base_model = torch.load(weights)
 
         # stem
+        self.stem_q = base_model.backbone.stem_q
         self.stem = base_model.backbone.stem
         for l in self.stem:
             l.freeze()
             l.to(self.device)
+        self.stem_dq0 = base_model.backbone.stem_dq0
         self.stem_exit0 = base_model.backbone.stem_exit0
         self.stem_exit0.freeze()
         self.stem_exit0.to(self.device)
-        #for l in self.stem_exit0:
-        #    l.freeze()
-        #    l.to(self.device)
+        self.stem_dq1 = base_model.backbone.stem_dq1
         self.stem_exit1 = base_model.backbone.stem_exit1
         self.stem_exit1.freeze()
         self.stem_exit1.to(self.device)
-        #for l in self.stem_exit1:
-        #    l.freeze()
-        #    l.to(self.device)
+        self.stem_dq2 = base_model.backbone.stem_dq2
         self.stem_exit2 = base_model.backbone.stem_exit
         self.stem_exit2.freeze()
         self.stem_exit2.to(self.device)
+        self.stem_dq3 = base_model.backbone.stem_dq3
         self.stem_exit = Transition(channels[0], mpk=2, norm=norm, act=act)
+        self.stem_dq4 = torch.quantization.DeQuantStub
 
 
     def forward(self, x):
         outputs = {}
+        x = self.stem_q(x)
         x = self.stem(x)
+        outputs["stem_exit"] = self.stem_dq4(self.stem_exit(self.stem_exit2(self.stem_exit1(self.stem_exit0(x)))))
+        x = self.stem_dq0(x)
         outputs["stem"] = x
-        outputs["stem_exit"] = self.stem_exit(self.stem_exit2(self.stem_exit1(self.stem_exit0(x))))
+
         if len(self.out_features) <= 1:
             return x
         return [v for k, v in outputs.items() if k in self.out_features]

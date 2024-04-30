@@ -36,60 +36,62 @@ class EELANBlock2(pytorch_lightning.LightningModule):
         base_model = torch.load(weights)
 
         # stem
+        self.stem_q = base_model.backbone.stem_q
         self.stem = base_model.backbone.stem
         for l in self.stem:
             l.freeze()
             l.to(self.device)
+        self.stem_dq0 = base_model.backbone.stem_dq
         self.stem_exit0 = Transition(channels[0], mpk=2, norm=norm, act=act)
         self.stem_exit = Transition(channels[0], mpk=2, norm=norm, act=act)
+        self.stem_dq1 = torch.quantization.DeQuantStub()
 
         # block1
+        self.block1_q = base_model.backbone.block1_q
         self.block1 = base_model.backbone.block1
         for l in self.block1:
             l.freeze()
             l.to(self.device)
+        self.block1_dq0 = base_model.backbone.block1_dq0
         self.block1_exit0 = base_model.backbone.block1_exit
         self.block1_exit0.freeze()
         self.block1_exit0.to(self.device)
-        #for l in self.block1_exit0:
-        #    l.freeze()
-        #    l.to(self.device)
+        self.block1_dq1 = base_model.backbone.block1_dq1
         self.block1_exit = Transition(channels[2], mpk=2, norm=norm, act=act)
-
+        self.block1_dq2 = torch.quantization.DeQuantStub()
 
         # block2
+        self.block2_q = base_model.backbone.block2_q
         self.block2 = base_model.backbone.block2
         for l in self.block2:
             l.freeze()
             l.to(self.device)
+        self.block2_dq0 = base_model.backbone.block2_dq0
         self.block2_exit0 = base_model.backbone.block2_exit
         self.block1_exit0.freeze()
         self.block1_exit0.to(self.device)
-        #for l in self.block2_exit0:
-        #    l.freeze()
-        #    l.to(self.device)
+        self.block2_dq1 = base_model.backbone.block2_dq1
         self.block2_exit = Transition(channels[3], mpk=2, norm=norm, act=act)
-
-        # block3
-        #self.block3 = base_model.backbone.stage3
-        #for l in self.block3:
-        #    l.freeze()
-        #    l.to(self.device)
-
-        #self.block3_exit = Transition(channels[4], mpk=2, norm=norm, act=act)
+        self.block2_dq2 = torch.quantization.DeQuantStub()
 
 
     def forward(self, x):
         outputs = {}
+        x = self.stem_q(x)
         x = self.stem(x)
+        outputs["stem_exit"] = self.stem_dq1(self.stem_exit(self.stem_exit0(x)))
+        x = self.stem_dq0(x)
         outputs["stem"] = x
-        outputs["stem_exit"] = self.stem_exit(self.stem_exit0(x))
+        x = self.block1_q(x)
         x = self.block1(x)
+        outputs["block1_exit"] = self.block1_dq2(self.block1_exit(self.block1_exit0(x)))
+        x = self.block1_dq0(x)
         outputs["block1"] = x
-        outputs["block1_exit"] = self.block1_exit(self.block1_exit0(x))
+        x = self.block2_q(x)
         x = self.block2(x)
+        outputs["block2_exit"] = self.block2_dq2(self.block2_exit(self.block2_exit0(x)))
+        x = self.block2_dq0(x)
         outputs["block2"] = x
-        outputs["block2_exit"] = self.block2_exit(self.block2_exit0(x))
         if len(self.out_features) <= 1:
             return x
         return [v for k, v in outputs.items() if k in self.out_features]

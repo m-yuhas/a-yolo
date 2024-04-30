@@ -32,48 +32,68 @@ class EELANFull(pytorch_lightning.LightningModule):
         self.out_features = out_features
 
         # stem
+        self.stem_q = torch.quantization.QuantStub()
         self.stem = nn.Sequential(
             BaseConv(3, 32, 3, 1, norm=norm, act=act),
             BaseConv(32, channels[0], 3, 2, norm=norm, act=act),
             BaseConv(channels[0], channels[0], 3, 1, norm=norm, act=act),
         )
+        self.stem_dq = torch.quantization.DeQuantStub()
 
         # block1
+        self.stage1_q = torch.quantization.QuantStub()
         self.stage1 = nn.Sequential(
             BaseConv(channels[0], channels[1], 3, 2, norm=norm, act=act),
             CSPLayer(channels[1], channels[2], expansion=0.5, num_bottle=depths[0], norm=norm, act=act),
         )
+        self.stage1_dq = torch.quantization.DeQuantStub()
 
         # block2
+        self.stage2_q = torch.quantization.QuantStub()
         self.stage2 = nn.Sequential(
             Transition(channels[2], mpk=2, norm=norm, act=act),
             CSPLayer(channels[2], channels[3], expansion=0.5, num_bottle=depths[1], norm=norm, act=act),
         )
+        self.stage2_dq = torch.quantization.DeQuantStub()
 
         # block3
+        self.stage3_q = torch.quantization.QuantStub()
         self.stage3 = nn.Sequential(
             Transition(channels[3], mpk=2, norm=norm, act=act),
             CSPLayer(channels[3], channels[4], expansion=0.5, num_bottle=depths[2], norm=norm, act=act),
         )
+        self.stage3_dq = torch.quantization.DeQuantStub()
 
         # block4
+        self.stage4_q = torch.quantization.QuantStub()
         self.stage4 = nn.Sequential(
             Transition(channels[4], mpk=2, norm=norm, act=act),
             SPPBottleneck(channels[4], channels[4], norm=norm, act=act),
             CSPLayer(channels[4], channels[4], expansion=0.5, num_bottle=depths[3], norm=norm, act=act),
         )
+        self.stage4_dq = torch.quantization.DeQuantStub()
 
     def forward(self, x):
         outputs = {}
+        x = self.stem_q(x)
         x = self.stem(x)
+        x = self.stem_dq(x)
         outputs["stem"] = x
+        x = self.stage1_q(x)
         x = self.stage1(x)
+        x = self.stage1_dq(x)
         outputs["block1"] = x
+        x = self.stage2_q(x)
         x = self.stage2(x)
+        x = self.stage2_dq(x)
         outputs["block2"] = x
+        x = self.stage3_q(x)
         x = self.stage3(x)
+        x = self.stage3_dq(x)
         outputs["block3"] = x
+        x = self.stage4_q(x)
         x = self.stage4(x)
+        x - self.stage4_dq(x)
         outputs["block4"] = x
         if len(self.out_features) <= 1:
             return x
