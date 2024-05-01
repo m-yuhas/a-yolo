@@ -19,8 +19,6 @@ class YOLOv7NECK2(nn.Module):
         super().__init__()
 
         # top-down conv
-        #self.spp = SPPCSPC(in_channels[2], in_channels[2] // 2, k=(5, 9, 13))
-        #self.conv_for_P5 = BaseConv(in_channels[2] // 2, in_channels[2] // 4, 1, 1, norm=norm, act=act)
         self.upsample = nn.Upsample(scale_factor=2, mode="nearest")
         self.conv_for_C4 = BaseConv(in_channels[1], in_channels[2] // 4, 1, 1, norm=norm, act=act)
         self.p5_p4 = CSPLayer(
@@ -55,27 +53,20 @@ class YOLOv7NECK2(nn.Module):
         )
 
         self.downsample_conv2 = Transition(in_channels[2] // 4, in_channels[2] // 2, mpk=2, norm=norm, act=act)
-        #self.n4_n5 = CSPLayer(
-        #    in_channels[2],
-        #    in_channels[2] // 2,
-        #    expansion=0.5,
-        #    num_bottle=depths[0],
-        #    norm=norm,
-        #    act=act,
-        #)
 
         self.n3 = BaseConv(in_channels[2] // 8, in_channels[2] // 4, 3, 1, norm=norm, act=act)
         self.n4 = BaseConv(in_channels[2] // 4, in_channels[2] // 2, 3, 1, norm=norm, act=act)
-        #self.n5 = BaseConv(in_channels[2] // 2, in_channels[2], 3, 1, norm=norm, act=act)
+        
+        self.q3 = torch.quantization.QuantStub()
+        self.q4 = torch.quantization.QuantStub()
+        self.dq3 = torch.quantization.DeQuantStub()
+        self.dq4 = torch.quantization.DeQuantStub()
 
     def forward(self, inputs):
         #  backbone
         [c3, c4] = inputs
-        # top-down
-        #p5 = self.spp(c5)
-        #p5_shrink = self.conv_for_P5(p5)
-        #p5_upsample = self.upsample(p5_shrink)
-        #p4 = torch.cat([p5_upsample, self.conv_for_C4(c4)], 1)
+        c3 = self.q3(c3)
+        c4 = self.q4(c4)
         p4 = c4
         p4 = self.p5_p4(p4)
 
@@ -91,13 +82,12 @@ class YOLOv7NECK2(nn.Module):
         n4 = self.n3_n4(n4)
 
         n4_downsample = self.downsample_conv2(n4)
-        #n5 = torch.cat([n4_downsample, p5], 1)
-        #n5 = self.n4_n5(n5)
 
         n3 = self.n3(n3)
         n4 = self.n4(n4)
-        #n5 = self.n5(n5)
 
+        n3 = self.dq3(n3)
+        n4 = self.dq4(n4)
         outputs = (n3, n4)
         return outputs
 

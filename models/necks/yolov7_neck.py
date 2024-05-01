@@ -68,9 +68,19 @@ class YOLOv7NECK(nn.Module):
         self.n4 = BaseConv(in_channels[2] // 4, in_channels[2] // 2, 3, 1, norm=norm, act=act)
         self.n5 = BaseConv(in_channels[2] // 2, in_channels[2], 3, 1, norm=norm, act=act)
 
+        self.q3 = torch.quantization.QuantStub()
+        self.q4 = torch.quantization.QuantStub()
+        self.q5 = torch.quantization.QuantStub()
+        self.dq3 = torch.quantization.DeQuantStub()
+        self.dq4 = torch.quantization.DeQuantStub()
+        self.dq5 = torch.quantization.DeQuantStub()
+
     def forward(self, inputs):
         #  backbone
         [c3, c4, c5] = inputs
+        c3 = self.q3(c3)
+        c4 = self.q4(c4)
+        c5 = self.q5(c5)
         # top-down
         p5 = self.spp(c5)
         p5_shrink = self.conv_for_P5(p5)
@@ -97,6 +107,9 @@ class YOLOv7NECK(nn.Module):
         n4 = self.n4(n4)
         n5 = self.n5(n5)
 
+        n3 = self.dq3(n3)
+        n4 = self.dq4(n4)
+        n5 = self.dq5(n5)
         outputs = (n3, n4, n5)
         return outputs
 

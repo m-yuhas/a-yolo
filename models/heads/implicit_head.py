@@ -25,13 +25,18 @@ class ImplicitHead(nn.Module):
             )
             self.im.append(ImplicitM(ch))
 
+        self.q = torch.quantization.QuantStub()
+        self.dq = torch.quantization.DeQuantStub()
+
     def forward(self, inputs):
         outputs = []
         for k, (ia, head_conv, im, x) in enumerate(zip(self.ia, self.conv, self.im, inputs)):
             # x: [batch_size, n_ch, h, w]
+            x = self.q(x)
             x = ia(x)
             x = head_conv(x)
             x = im(x)
+            x = self.dq(x)
             outputs.append(x)
         return outputs
 
