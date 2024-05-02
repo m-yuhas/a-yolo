@@ -81,8 +81,21 @@ def eelan_full(cfg):
     return backbone
 
 def eelan_b3(cfg):
-    backbone = EELANBlock3(cfg['depths'], cfg['channels'], cfg['outputs'], cfg['norm'], cfg['act'])
+    backbone = EELANBlock3(cfg['depths'], cfg['channels'], cfg['outputs'], cfg['norm'], cfg['act'], cfg['weights'])
     return backbone
+
+def eelan_b2(cfg):
+    backbone = EELANBlock2(cfg['depths'], cfg['channels'], cfg['outputs'], cfg['norm'], cfg['act'], cfg['weights'])
+    return backbone
+
+def eelan_b1(cfg):
+    backbone = EELANBlock1(cfg['depths'], cfg['channels'], cfg['outputs'], cfg['norm'], cfg['act'], cfg['weights'])
+    return backbone
+
+def eelan_b0(cfg):
+    backbone = EELANBlock0(cfg['depths'], cfg['channels'], cfg['outputs'], cfg['norm'], cfg['act'], cfg['weights'])
+    return backbone
+
 
 def vggnet(cfg):
     backbone = VGGNET(cfg['depths'], cfg['channels'], cfg['outputs'], cfg['norm'], cfg['act'])
@@ -134,6 +147,14 @@ def al_pafpn(cfg):
 
 def yolov7neck(cfg):
     neck = YOLOv7NECK(cfg['depths'], cfg['channels'], cfg['norm'], cfg['act'])
+    return neck
+
+def yolov7neck1(cfg):
+    neck = YOLOv7NECK1(cfg['depths'], cfg['channels'], cfg['norm'], cfg['act'])
+    return neck
+
+def yolov7neck2(cfg):
+    neck = YOLOv7NECK2(cfg['depths'], cfg['channels'], cfg['norm'], cfg['act'])
     return neck
 
 def ssdneck(cfg):
