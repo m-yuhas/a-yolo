@@ -5,6 +5,9 @@ from models.backbones.mobilenext_csp import CSPMobileNext
 from models.backbones.eelan import EELAN
 from models.backbones.eelan_full import EELANFull
 from models.backbones.eelan_b3  import EELANBlock3
+from models.backbones.eelan_b2 import EELANBlock2
+from models.backbones.eelan_b1 import EELANBlock1
+from models.backbones.eelan_b0 import EELANBlock0
 from models.backbones.ecmnet import ECMNet
 from models.backbones.shufflenetv2 import ShuffleNetV2_Plus
 from models.backbones.mobilenetv3 import MobileNetV3_Small, MobileNetV3_Large
@@ -15,6 +18,8 @@ from models.backbones.vggnet import VGGNET
 from models.necks.pafpn_csp import CSPPAFPN
 from models.necks.pafpn_al import AL_PAFPN
 from models.necks.yolov7_neck import YOLOv7NECK
+from models.necks.yolov7_neck1 import YOLOv7NECK1
+from models.necks.yolov7_neck2 import YOLOv7NECK2
 from models.necks.ssd_neck import SSDNECK
 # heads
 from models.heads.decoupled_head import DecoupledHead
