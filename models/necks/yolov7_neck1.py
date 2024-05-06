@@ -18,8 +18,8 @@ class YOLOv7NECK1(nn.Module):
     ):
         super().__init__()
 
-        self.n3 = BaseConv(in_channels[2] // 8, in_channels[2] // 4, 3, 1, norm=norm, act=act)
-        self.q3 = torch.qunatization.QuantStub()
+        self.n3 = BaseConv(in_channels[0], in_channels[0], 3, 1, norm=norm, act=act)
+        self.q3 = torch.quantization.QuantStub()
         self.dq3 = torch.quantization.DeQuantStub()
 
     def forward(self, inputs):
