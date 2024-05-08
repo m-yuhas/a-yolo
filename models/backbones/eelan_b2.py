@@ -68,8 +68,8 @@ class EELANBlock2(pytorch_lightning.LightningModule):
             l.to(self.device)
         self.block2_dq0 = base_model.backbone.block2_dq0
         self.block2_exit0 = base_model.backbone.block2_exit
-        self.block1_exit0.freeze()
-        self.block1_exit0.to(self.device)
+        self.block2_exit0.freeze()
+        self.block2_exit0.to(self.device)
         self.block2_dq1 = base_model.backbone.block2_dq1
         self.block2_exit = Transition(channels[3], mpk=2, norm=norm, act=act)
         self.block2_dq2 = torch.quantization.DeQuantStub()
