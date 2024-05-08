@@ -53,16 +53,15 @@ class EELANBlock0(pytorch_lightning.LightningModule):
         self.stem_exit2 = base_model.backbone.stem_exit
         self.stem_exit2.freeze()
         self.stem_exit2.to(self.device)
-        self.stem_dq3 = base_model.backbone.stem_dq3
         self.stem_exit = Transition(channels[0], mpk=2, norm=norm, act=act)
-        self.stem_dq4 = torch.quantization.DeQuantStub
+        self.stem_dq3 = torch.quantization.DeQuantStub()
 
 
     def forward(self, x):
         outputs = {}
         x = self.stem_q(x)
         x = self.stem(x)
-        outputs["stem_exit"] = self.stem_dq4(self.stem_exit(self.stem_exit2(self.stem_exit1(self.stem_exit0(x)))))
+        outputs["stem_exit"] = self.stem_dq3(self.stem_exit(self.stem_exit2(self.stem_exit1(self.stem_exit0(x)))))
         x = self.stem_dq0(x)
         outputs["stem"] = x
 

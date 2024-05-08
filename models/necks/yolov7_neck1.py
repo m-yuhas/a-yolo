@@ -18,7 +18,7 @@ class YOLOv7NECK1(nn.Module):
     ):
         super().__init__()
 
-        self.n3 = BaseConv(in_channels[0], in_channels[0], 3, 1, norm=norm, act=act)
+        self.n3 = BaseConv(in_channels[0], in_channels[0] * 2, 3, 4, norm=norm, act=act)
         self.q3 = torch.quantization.QuantStub()
         self.dq3 = torch.quantization.DeQuantStub()
 
@@ -27,7 +27,7 @@ class YOLOv7NECK1(nn.Module):
         c3 = inputs
         c3 = self.q3(c3)
         n3 = self.n3(c3)
-        n3 = self.dq3(c3)
+        n3 = self.dq3(n3)
         outputs = (n3,)
         return outputs
 
