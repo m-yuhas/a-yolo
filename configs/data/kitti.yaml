@@ -3,15 +3,15 @@ name: KITTI
 datamodule: 'coco'
 
 dataset:
-    dir: '/mnt/7fad4474-58d9-48d4-a565-db321fc0cca5/michaelj004/Kitti/'
+    dir: '/mnt/sdb/Datasets/Kitti2/'
     train: 'train'  # directory name of training image
     train_json: 'train_annotations.json'
     val: 'val'
     val_json: 'val_annotations.json'
-    test: 'test'
-    test_json: 'test_annotations.json'
-    train_size: [640,640]  # [224,224] [416,416] [640,640]
-    val_size: [640,640]
+    test: 'val'
+    test_json: 'val_annotations.json'
+    train_size: [416,416]  # [224,224] [416,416] [640,640]
+    val_size: [416,416]
     train_batch_size: 16
     val_batch_size: 16
 

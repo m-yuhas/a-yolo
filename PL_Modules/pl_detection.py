@@ -148,7 +148,7 @@ class LitDetection(LightningModule):
         print("Batch {:d}, mAP = {:.3f}, mAP50 = {:.3f}".format(self.current_epoch, ap50_95, ap50))
         print(summary)
         # VOC Evaluator
-        # VOCEvaluator(det_list, self.trainer.datamodule.dataset_test, iou_thr=0.5)
+        VOCEvaluator(det_list, self.trainer.datamodule.dataset_test, iou_thr=0.5)
         # inference time
         average_ifer_time = torch.tensor(self.infr_times, dtype=torch.float32).mean().item()
         average_nms_time = torch.tensor(self.nms_times, dtype=torch.float32).mean().item()

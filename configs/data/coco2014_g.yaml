@@ -10,8 +10,8 @@ dataset:
     val_json: 'annotations/annotations/instances_val2014.json'
     test: 'test'
     test_json: 'annotations/test.json'
-    train_size: [224,224]  # [224,224] [416,416] [640,640]
-    val_size: [224,224]
+    train_size: [300,300]  # [224,224] [416,416] [640,640]
+    val_size: [300,300]
     train_batch_size: 2
     val_batch_size: 2
 
