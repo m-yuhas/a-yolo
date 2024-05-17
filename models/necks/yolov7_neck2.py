@@ -65,6 +65,8 @@ class YOLOv7NECK2(nn.Module):
     def forward(self, inputs):
         #  backbone
         [c3, c4] = inputs
+        #print(c3.shape)
+        #print(c4.shape)
         c3 = self.q3(c3)
         c4 = self.q4(c4)
         p4 = c4
@@ -140,7 +142,7 @@ class CSPLayer(nn.Module):
 class Transition(nn.Module):
     def __init__(self, in_channel, out_channel, mpk=2, norm='bn', act="silu"):
         super(Transition, self).__init__()
-        self.mp = nn.MaxPool2d(kernel_size=mpk, stride=mpk)
+        self.mp = nn.MaxPool2d(kernel_size=mpk, stride=mpk, ceil_mode=True)
         self.conv1 = BaseConv(in_channel, out_channel//2, 1, 1)
         self.conv2 = BaseConv(in_channel, out_channel//2, 1, 1)
         self.conv3 = BaseConv(out_channel//2, out_channel//2, 3, 2, norm=norm, act=act)
