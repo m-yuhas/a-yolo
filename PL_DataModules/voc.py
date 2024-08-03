@@ -1,3 +1,4 @@
+# TODO: this can probably be a child class of PL Object detection data module
 import torch
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
@@ -8,6 +9,8 @@ from torch.utils.data.sampler import BatchSampler, RandomSampler
 
 
 class VOCDataModule(pl.LightningDataModule):
+    """Lightning DataModule for VOC style datasets."""
+
     def __init__(self, cfgs):
         super().__init__()
         self.dataset_train = None
