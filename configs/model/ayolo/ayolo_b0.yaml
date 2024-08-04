@@ -5,7 +5,7 @@ backbone:
     outputs: [ "stem_exit" ]
     norm: bn
     act: relu
-    weights: ayolo-b1-carla-416.pt 
+    weights: ayolo-b1-carla-576-heavy.pt 
 
 neck:
     name: yolov7neck1

@@ -4,15 +4,15 @@ backbone:
     channels: [64,128,256,512, 1024] # five blocks
     outputs: [ "stem_exit", "block1_exit", "block2_exit" ]
     norm: bn
-    act: silu
-    weights: ayolo_b3_kitti_640.pt 
+    act: relu
+    weights: ayolo-b3-carla-576-heavy.pt
 
 neck:
     name: yolov7neck
     depths: [4,4,4,4]
     channels: [64, 256, 512]
     norm: bn
-    act: silu
+    act: relu
 
 head:
     name: implicit_head
@@ -20,7 +20,7 @@ head:
     num_anchor: 3
     channels: [128, 256, 512]
     norm: bn
-    act: silu
+    act: relu
 
 loss:
     name: yolov7

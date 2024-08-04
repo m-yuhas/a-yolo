@@ -19,6 +19,7 @@ def train_argument_parser():
     parser.add_argument("--conf", default=0.5, type=float, help="test conf")
     parser.add_argument("--show_dir", default=None, type=str, help="The directory for result pictures")
     parser.add_argument("--show_score_thr", default=0.3, type=int, help="The threshold of visualized score")
+    parser.add_argument("--epochs", default=300, type=int, help="# Epochs to train")
     return parser
 
 

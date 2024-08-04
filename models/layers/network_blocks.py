@@ -8,7 +8,7 @@ import pytorch_lightning
 class BaseConv(pytorch_lightning.LightningModule):
     """A Convolution2d -> Normalization -> Activation"""
     def __init__(
-        self, in_channels, out_channels, ksize, stride, padding=None, groups=1, bias=False, norm="bn", act="silu"
+        self, in_channels, out_channels, ksize, stride, padding=None, groups=1, bias=False, norm="bn", act="relu"
     ):
         super().__init__()
         # same padding
@@ -44,7 +44,7 @@ class BaseConv(pytorch_lightning.LightningModule):
 class Focus(pytorch_lightning.LightningModule):
     """Focus width and height information into channel space."""
 
-    def __init__(self, in_channels, out_channels, ksize=1, stride=1, norm='bn', act="silu"):
+    def __init__(self, in_channels, out_channels, ksize=1, stride=1, norm='bn', act="relu"):
         super().__init__()
         self.conv = BaseConv(in_channels * 4, out_channels, ksize, stride, norm=norm, act=act)
 
@@ -75,7 +75,7 @@ class Bottleneck(pytorch_lightning.LightningModule):
         shortcut=True,
         expansion=0.5,
         norm='bn',
-        act="silu",
+        act="relu",
     ):
         super().__init__()
         hidden_channels = int(out_channels * expansion)
@@ -101,7 +101,7 @@ class CSPLayer(pytorch_lightning.LightningModule):
         shortcut=True,
         expansion=0.5,
         norm='bn',
-        act="silu",
+        act="relu",
     ):
         """
         Args:
@@ -135,7 +135,7 @@ class CSPLayer(pytorch_lightning.LightningModule):
 class SPPBottleneck(pytorch_lightning.LightningModule):
     """Spatial pyramid pooling layer used in YOLOv3-SPP"""
     def __init__(
-        self, in_channels, out_channels, kernel_sizes=(5, 9, 13), norm='bn', act="silu"
+        self, in_channels, out_channels, kernel_sizes=(5, 9, 13), norm='bn', act="relu"
     ):
         super().__init__()
         hidden_channels = in_channels // 2

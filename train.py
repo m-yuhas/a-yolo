@@ -32,9 +32,9 @@ def main():
     trainer = Trainer(
         accelerator="gpu",
         devices=1,
-        max_epochs=300,
+        max_epochs=args.epochs,
         check_val_every_n_epoch=5,
-        log_every_n_steps=10,
+        log_every_n_steps=100,
         enable_progress_bar=True,
         logger=logger,
         callbacks=[checkpoint_callback],

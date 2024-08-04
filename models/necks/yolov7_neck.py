@@ -14,7 +14,7 @@ class YOLOv7NECK(nn.Module):
             depths=(1, 1, 1, 1),
             in_channels=(512, 1024, 1024),
             norm='bn',
-            act="silu",
+            act="relu",
     ):
         super().__init__()
 
@@ -122,7 +122,7 @@ class CSPLayer(nn.Module):
             expansion=0.5,
             num_bottle=1,
             norm='bn',
-            act="silu",
+            act="relu",
     ):
         """
         Args:
@@ -160,7 +160,7 @@ class CSPLayer(nn.Module):
 
 
 class Transition(nn.Module):
-    def __init__(self, in_channel, out_channel, mpk=2, norm='bn', act="silu"):
+    def __init__(self, in_channel, out_channel, mpk=2, norm='bn', act="relu"):
         super(Transition, self).__init__()
         self.mp = nn.MaxPool2d(kernel_size=mpk, stride=mpk)
         self.conv1 = BaseConv(in_channel, out_channel//2, 1, 1)

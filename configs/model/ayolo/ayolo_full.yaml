@@ -4,14 +4,14 @@ backbone:
     channels: [64,128,256,512,1024] # five blocks
     outputs: [ "block2", "block3", "block4" ]
     norm: bn
-    act: silu
+    act: relu
 
 neck:
     name: yolov7neck
     depths: [4,4,4,4]
     channels: [512, 1024, 1024]
     norm: bn
-    act: silu
+    act: relu
 
 head:
     name: implicit_head
@@ -19,7 +19,7 @@ head:
     num_anchor: 3
     channels: [256, 512, 1024]
     norm: bn
-    act: silu
+    act: relu
 
 loss:
     name: yolov7

@@ -17,6 +17,7 @@ class LitDetection(LightningModule):
 
     def __init__(self, model, model_cfgs, data_cfgs, test_cfgs=None):
         super().__init__()
+        self.validation_step_outputs = []
         self.model = model
         self.model.backbone.to(self.device)
         self.model.neck.to(self.device)
@@ -46,6 +47,7 @@ class LitDetection(LightningModule):
             self.test_conf = test_cfgs['test_conf']
             self.show_dir = test_cfgs['show_dir']
             self.show_score_thr = test_cfgs['show_score_thr']
+        self.test_outputs = []
 
     def on_train_start(self) -> None:
         if self.ema is True:
@@ -81,11 +83,14 @@ class LitDetection(LightningModule):
         self.nms_times.append(time.time() - start_time)
         json_det, det = format_outputs(detections, image_id, img_hw, self.img_size_val,
                                        self.trainer.datamodule.dataset_val.class_ids, labels)
+        self.validation_step_outputs.append((json_det,det))
         return json_det, det
 
-    def validation_epoch_end(self, val_step_outputs):
+    #def on_validation_epoch_end(self, val_step_outputs):
+    def on_validation_epoch_end(self):
         json_list = []
         det_list = []
+        val_step_outputs = self.validation_step_outputs
         for i in range(len(val_step_outputs)):
             json_list += val_step_outputs[i][0]
             det_list += val_step_outputs[i][1]
@@ -94,7 +99,7 @@ class LitDetection(LightningModule):
         print("Batch {:d}, mAP = {:.3f}, mAP50 = {:.3f}".format(self.current_epoch, ap50_95, ap50))
         print(summary)
         # VOC Evaluator
-        VOCEvaluator(det_list, self.trainer.datamodule.dataset_val, iou_thr=0.5)
+        #VOCEvaluator(det_list, self.trainer.datamodule.dataset_val, iou_thr=0.5)
 
         self.log("mAP", ap50_95, prog_bar=False)
         self.log("mAP50", ap50, prog_bar=False)
@@ -135,11 +140,14 @@ class LitDetection(LightningModule):
         self.nms_times.append(time.time() - start_time)
         json_det, det = format_outputs(detections, image_id, img_hw, self.img_size_val,
                                        self.trainer.datamodule.dataset_test.class_ids, labels)
+
+        self.test_outputs.append((json_det,det,imgs,img_name))
         return json_det, det, imgs, img_name
 
-    def test_epoch_end(self, test_step_outputs):
+    def on_test_epoch_end(self):
         json_list = []
         det_list = []
+        test_step_outputs = self.test_outputs
         for i in range(len(test_step_outputs)):
             json_list += test_step_outputs[i][0]
             det_list += test_step_outputs[i][1]

@@ -1,19 +1,19 @@
 # Parameters
-name: CARLA
+name: KITTI
 datamodule: 'coco'
 
 dataset:
-    dir: '/home/users/ntu/michaelj/scratch/Carla_RTAS/'
-    train: 'train'  # directory name of training image
-    train_json: 'train/annotations_train5in.json'
-    val: 'val'
-    val_json: 'val_annotations.json'
-    test: ''
-    test_json: 'test_1_9_annotations.json'
-    train_size: [256, 256]  # [224,224] [416,416] [640,640]
-    val_size: [256,256]
-    train_batch_size: 64
-    val_batch_size: 64
+    dir: '/home/users/ntu/michaelj/scratch/kitti'
+    train: 'images'  # directory name of training image
+    train_json: 'kitti_train_annotations.json'
+    val: 'images'
+    val_json: 'kitti_val_annotations.json'
+    test: 'images'
+    test_json: 'kitti_test_annotations.json'
+    train_size: [288, 864]  # [224,224] [416,416] [640,640]
+    val_size: [288, 864]
+    train_batch_size: 32
+    val_batch_size: 32
 
 transform:
     # Train transform

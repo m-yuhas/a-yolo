@@ -3,17 +3,17 @@ name: CARLA
 datamodule: 'coco'
 
 dataset:
-    dir: '/home/users/ntu/michaelj/scratch/Carla_RTAS/'
+    dir: '/home/users/ntu/michaelj/scratch/'
     train: 'train'  # directory name of training image
-    train_json: 'train/annotations_train5in.json'
+    train_json: 'train_heavy.json'
     val: 'val'
-    val_json: 'val_annotations.json'
-    test: ''
-    test_json: 'test_1_9_annotations.json'
-    train_size: [256, 256]  # [224,224] [416,416] [640,640]
-    val_size: [256,256]
-    train_batch_size: 64
-    val_batch_size: 64
+    val_json: 'val_heavy.json'
+    test: 'val'
+    test_json: 'val_light.json'
+    train_size: [576, 576]  # [224,224] [416,416] [640,640]
+    val_size: [576,576]
+    train_batch_size: 32
+    val_batch_size: 32
 
 transform:
     # Train transform

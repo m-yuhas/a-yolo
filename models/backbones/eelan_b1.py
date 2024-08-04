@@ -23,7 +23,7 @@ class EELANBlock1(pytorch_lightning.LightningModule):
         channels=(64, 128, 256, 512, 1024),
         out_features=("block2", "block3", "block4"),
         norm='bn',
-        act="silu",
+        act="relu",
         weights="",
     ):
         super().__init__()
@@ -96,7 +96,7 @@ class CSPLayer(pytorch_lightning.LightningModule):
         expansion=0.5,
         num_bottle=1,
         norm='bn',
-        act="silu",
+        act="relu",
     ):
         """
         Args:
@@ -133,7 +133,7 @@ class CSPLayer(pytorch_lightning.LightningModule):
 
 
 class Transition(pytorch_lightning.LightningModule):
-    def __init__(self, in_channel, mpk=2, norm='bn', act="silu"):
+    def __init__(self, in_channel, mpk=2, norm='bn', act="relu"):
         super(Transition, self).__init__()
         self.mp = nn.MaxPool2d(kernel_size=mpk, stride=mpk)
         self.conv1 = BaseConv(in_channel, in_channel//2, 1, 1)

@@ -24,6 +24,8 @@ class YOLOv7Loss(nn.Module):
         self.ch = 5 + self.num_classes
 
         self.balance = [0.4, 1.0, 4]
+        #self.balance = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        #self.balance = [1.0, 1.0, 1.0]
         self.box_ratio = 0.05
         self.obj_ratio = 1
         self.cls_ratio = 0.5 * (num_classes / 80)
@@ -267,6 +269,7 @@ class YOLOv7Loss(nn.Module):
                 matching_matrix[:, anchor_matching_gt > 1] *= 0.0
                 matching_matrix[cost_argmin, anchor_matching_gt > 1] = 1.0
             fg_mask_inboxes = matching_matrix.sum(0) > 0.0
+            fg_mask_inboxes = fg_mask_inboxes.to(torch.device('cpu'))
             matched_gt_inds = matching_matrix[:, fg_mask_inboxes].argmax(0)
 
             from_which_layer = from_which_layer[fg_mask_inboxes]
