@@ -23,9 +23,8 @@ class YOLOv7Loss(nn.Module):
         self.na = len(anchors[0])
         self.ch = 5 + self.num_classes
 
-        self.balance = [0.4, 1.0, 4]
-        #self.balance = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-        #self.balance = [1.0, 1.0, 1.0]
+        #self.balance = [0.4, 1.0, 4]
+        self.balance = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
         self.box_ratio = 0.05
         self.obj_ratio = 1
         self.cls_ratio = 0.5 * (num_classes / 80)
