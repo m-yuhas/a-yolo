@@ -3,7 +3,7 @@ import torch
 from pytorch_lightning import LightningModule
 # Train
 from models.utils.ema import ModelEMA
-from torch.optim import SGD
+from torch.optim import SGD, Adam
 from models.layers.lr_scheduler import CosineWarmupScheduler
 # Evaluate
 from utils.flops import model_summary
@@ -114,7 +114,8 @@ class LitDetection(LightningModule):
         self.infr_times, self.nms_times = [], []
 
     def configure_optimizers(self):
-        optimizer = SGD(self.parameters(), lr=self.co["learning_rate"], momentum=self.co["momentum"])
+        optimizer = Adam(self.parameters(), lr=self.co["learning_rate"])
+        #optimizer = SGD(self.parameters(), lr=self.co["learning_rate"], momentum=self.co["momentum"])
         total_steps = self.trainer.estimated_stepping_batches
         lr_scheduler = CosineWarmupScheduler(optimizer, warmup=self.warmup * total_steps, max_iters=total_steps)
         return [optimizer], [lr_scheduler]
@@ -156,7 +157,7 @@ class LitDetection(LightningModule):
         print("Batch {:d}, mAP = {:.3f}, mAP50 = {:.3f}".format(self.current_epoch, ap50_95, ap50))
         print(summary)
         # VOC Evaluator
-        VOCEvaluator(det_list, self.trainer.datamodule.dataset_test, iou_thr=0.5)
+        #VOCEvaluator(det_list, self.trainer.datamodule.dataset_test, iou_thr=0.5)
         # inference time
         average_ifer_time = torch.tensor(self.infr_times, dtype=torch.float32).mean().item()
         average_nms_time = torch.tensor(self.nms_times, dtype=torch.float32).mean().item()

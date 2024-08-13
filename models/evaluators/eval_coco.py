@@ -25,12 +25,27 @@ def COCOEvaluator(json_list, val_dataset):
         # json.dump(coco_pred, open("./COCO_val.json", "w"))
 
         cocoEval = COCOeval(cocoGt, cocoDt, annType[1])
+        cocoEval.params.useCats = 0 # MJY
+
         cocoEval.evaluate()
         cocoEval.accumulate()
         redirect_string = io.StringIO()
         with contextlib.redirect_stdout(redirect_string):
             cocoEval.summarize()
         info = redirect_string.getvalue()
+
+        ### PER CLASS TEST
+        for catId in cocoGt.getCatIds():
+            rs = io.StringIO()
+            with contextlib.redirect_stdout(rs):
+                coco_eval = COCOeval(cocoGt, cocoDt, annType[1])
+                coco_eval.params.catIds = [catId]
+                coco_eval.evaluate()
+                coco_eval.accumulate()
+                coco_eval.summarize()
+            print(f'Cat {catId}: mAP={coco_eval.stats[0]}, mAP50={coco_eval.stats[1]}')
+
+
         return cocoEval.stats[0], cocoEval.stats[1], info
     else:
         return 0.0, 0.0, "No detection!"
