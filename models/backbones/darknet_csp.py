@@ -12,7 +12,7 @@ from torch import nn
 from models.layers.network_blocks import Focus, BaseConv, CSPLayer, SPPBottleneck
 
 import time
-
+import torch
 
 class CSPDarkNet(nn.Module):
     """
@@ -25,6 +25,7 @@ class CSPDarkNet(nn.Module):
         out_features=("stage2", "stage3", "stage4"),
         norm='bn',
         act="silu",
+        weights=None,
     ):
         super().__init__()
 
@@ -60,8 +61,16 @@ class CSPDarkNet(nn.Module):
             CSPLayer(channels[4], channels[4], num_bottle=depths[3], shortcut=False, norm=norm, act=act),
         )
 
+        if weights is not None:
+            base = torch.load(weights)
+            self.stem = base.backbone.stem
+            self.stage1 = base.backbone.stage1
+            self.stage2 = base.backbone.stage2
+            self.stage3 = base.backbone.stage3
+            self.stage4 = base.backbone.stage4
+
     def forward(self, x):
-        start = time.time()
+        #start = time.time()
         outputs = {}
         x = self.stem(x)
         outputs["stem"] = x
@@ -75,5 +84,5 @@ class CSPDarkNet(nn.Module):
         outputs["stage4"] = x
         if len(self.out_features) <= 1:
             return x
-        print(f'Backbone Time: {time.time() - start}')
+        #print(f'Backbone Time: {time.time() - start}')
         return [v for k, v in outputs.items() if k in self.out_features]
