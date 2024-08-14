@@ -11,6 +11,8 @@ Depths and Channels
 from torch import nn
 from models.layers.network_blocks import Focus, BaseConv, CSPLayer, SPPBottleneck
 
+import time
+
 
 class CSPDarkNet(nn.Module):
     """
@@ -59,6 +61,7 @@ class CSPDarkNet(nn.Module):
         )
 
     def forward(self, x):
+        start = time.time()
         outputs = {}
         x = self.stem(x)
         outputs["stem"] = x
@@ -72,4 +75,5 @@ class CSPDarkNet(nn.Module):
         outputs["stage4"] = x
         if len(self.out_features) <= 1:
             return x
+        print(f'Backbone Time: {time.time() - start}')
         return [v for k, v in outputs.items() if k in self.out_features]

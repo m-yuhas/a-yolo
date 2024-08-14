@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+import time
+
 from models.layers.network_blocks import BaseConv, CSPLayer
 
 
@@ -16,7 +18,7 @@ class CSPPAFPN(nn.Module):
         act="silu",
     ):
         super().__init__()
-
+        self.in_channels = in_channels
         self.shrink_conv1 = BaseConv(in_channels[2], in_channels[1], 1, 1, norm=norm, act=act)
         self.shrink_conv2 = BaseConv(in_channels[1], in_channels[0], 1, 1, norm=norm, act=act)
         self.upsample = nn.Upsample(scale_factor=2, mode="nearest")
@@ -58,6 +60,7 @@ class CSPPAFPN(nn.Module):
         )
 
     def forward(self, inputs):
+        start = time.time()
         #  backbone
         [c3, c4, c5] = inputs
         # top-down
@@ -83,4 +86,5 @@ class CSPPAFPN(nn.Module):
         n5 = self.n4_n5(n5)
 
         outputs = (n3, n4, n5)
+        print(f'Neck Time: {time.time() - start}')
         return outputs
