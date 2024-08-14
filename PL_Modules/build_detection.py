@@ -68,7 +68,7 @@ class OneStageD(nn.Module):
 
 # Backbones
 def cspdarknet(cfg):
-    backbone = CSPDarkNet(cfg['depths'], cfg['channels'], cfg['outputs'], cfg['norm'], cfg['act'])
+    backbone = CSPDarkNet(cfg['depths'], cfg['channels'], cfg['outputs'], cfg['norm'], cfg['act'], cfg['weights'])
     return backbone
 
 

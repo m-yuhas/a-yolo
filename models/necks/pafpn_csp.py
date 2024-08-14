@@ -60,7 +60,7 @@ class CSPPAFPN(nn.Module):
         )
 
     def forward(self, inputs):
-        start = time.time()
+        #start = time.time()
         #  backbone
         [c3, c4, c5] = inputs
         # top-down
@@ -86,5 +86,5 @@ class CSPPAFPN(nn.Module):
         n5 = self.n4_n5(n5)
 
         outputs = (n3, n4, n5)
-        print(f'Neck Time: {time.time() - start}')
+        #print(f'Neck Time: {time.time() - start}')
         return outputs

@@ -78,7 +78,7 @@ class DecoupledHead(nn.Module):
             conv.bias = torch.nn.Parameter(b.view(-1), requires_grad=True)
 
     def forward(self, inputs):
-        start = time.time()
+        #start = time.time()
         outputs = []
         for k, (cls_conv, reg_conv, x) in enumerate(zip(self.cls_convs, self.reg_convs, inputs)):
             # Change all inputs to the same channel.
@@ -97,5 +97,5 @@ class DecoupledHead(nn.Module):
             output = torch.cat([reg_output, obj_output, cls_output], 1)
             outputs.append(output)
 
-        print(f'Head Time: {time.time() - start}')
+        #print(f'Head Time: {time.time() - start}')
         return outputs
