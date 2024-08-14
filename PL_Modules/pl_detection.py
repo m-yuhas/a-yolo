@@ -20,15 +20,8 @@ class LitDetection(LightningModule):
         self.validation_step_outputs = []
         self.model = model
         self.model.backbone.to(self.device)
-        #self.model.neck.to(self.device)
-        #self.model.head.to(self.device)
-        # MJY modify for multi-train
-        for n in self.model.neck:
-            if n is not None:
-                n.to(self.device)
-        for h in self.model.head:
-            if h is not None:
-                h.to(self.device)
+        self.model.neck.to(self.device)
+        self.model.head.to(self.device)
         self.model.loss.to(self.device)
         # Parameters for training
         self.co = model_cfgs['optimizer']
