@@ -3,7 +3,8 @@ from utils.defaults import train_argument_parser, load_config
 from utils.build_data import build_data
 from utils.build_logger import build_logger
 from pytorch_lightning.callbacks import ModelCheckpoint
-from PL_Modules.build_detection import build_model
+#from PL_Modules.build_detection import build_model
+from PL_Modules.build_multiexit import build_model
 from PL_Modules.pl_detection import LitDetection
 
 

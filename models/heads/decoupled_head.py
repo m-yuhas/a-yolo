@@ -3,6 +3,8 @@ import torch
 import torch.nn as nn
 from models.layers.network_blocks import BaseConv
 
+import time
+
 
 class DecoupledHead(nn.Module):
     def __init__(
@@ -14,6 +16,7 @@ class DecoupledHead(nn.Module):
             act="silu",
     ):
         super().__init__()
+        self.in_channels = in_channels
         self.n_anchors = n_anchors
         self.num_classes = num_classes
         ch = self.n_anchors * self.num_classes
@@ -75,6 +78,7 @@ class DecoupledHead(nn.Module):
             conv.bias = torch.nn.Parameter(b.view(-1), requires_grad=True)
 
     def forward(self, inputs):
+        start = time.time()
         outputs = []
         for k, (cls_conv, reg_conv, x) in enumerate(zip(self.cls_convs, self.reg_convs, inputs)):
             # Change all inputs to the same channel.
@@ -92,4 +96,6 @@ class DecoupledHead(nn.Module):
             # output: [batch_size, n_ch, h, w]
             output = torch.cat([reg_output, obj_output, cls_output], 1)
             outputs.append(output)
+
+        print(f'Head Time: {time.time() - start}')
         return outputs
