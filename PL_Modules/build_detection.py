@@ -40,7 +40,10 @@ def build_model(cfg_models, num_classes):
     cl = cfg_models['loss']
 
     backbone = eval(cb['name'])(cb)
-    neck = eval(cn['name'])(cn)
+    if cn is not None:
+        neck = eval(cn['name'])(cn)
+    else:
+        neck = None
     head = eval(ch['name'])(ch, num_classes)
     loss = eval(cl['name'])(cl, num_classes)
     model = OneStageD(backbone, neck, head, loss)
@@ -60,6 +63,10 @@ class OneStageD(nn.Module):
         x = self.backbone(x)
         if self.neck is not None:
             x = self.neck(x)
+        # BAD: remeber to fix hack:
+        #x = [x,]
+        #for i in x:
+        #    print(len(i))
         x = self.head(x)
         if labels is not None:
             x = self.loss(x, labels)

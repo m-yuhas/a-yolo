@@ -68,6 +68,12 @@ class CSPDarkNet(nn.Module):
             self.stage2 = base.backbone.stage2
             self.stage3 = base.backbone.stage3
             self.stage4 = base.backbone.stage4
+            self.stem.requires_grad_(False)
+            self.stage1.requires_grad_(False)
+            self.stage2.requires_grad_(False)
+            self.stage3.requires_grad_(False)
+            self.stage4.requires_grad_(False)
+
 
     def forward(self, x):
         #start = time.time()

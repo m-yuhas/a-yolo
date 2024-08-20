@@ -4,16 +4,16 @@ datamodule: 'coco'
 
 dataset:
     dir: '/home/users/ntu/michaelj/scratch/kitti'
-    train: 'images'  # directory name of training image
+    train: 'sunny'  # directory name of training image
     train_json: 'kitti_train_annotations.json'
-    val: 'images'
+    val: 'sunny'
     val_json: 'kitti_val_annotations.json'
     test: 'images'
     test_json: 'kitti_test_annotations.json'
-    train_size: [288, 864]  # [224,224] [416,416] [640,640]
-    val_size: [288, 864]
-    train_batch_size: 32
-    val_batch_size: 32
+    train_size: [320, 320]  # [224,224] [416,416] [640,640]
+    val_size: [320, 320]
+    train_batch_size: 128
+    val_batch_size: 128
 
 transform:
     # Train transform
@@ -38,5 +38,7 @@ transform:
     # Cutout rounding background
     cutoutR_prob: 0
 
-num_classes: 2
-classes: [vehicle, pedestrian]
+num_classes: 1
+classes: [car]
+#num_classes: 2
+#classes: [vehicle, pedestrian]

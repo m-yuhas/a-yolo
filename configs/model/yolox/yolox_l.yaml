@@ -5,6 +5,7 @@ backbone:
     outputs: [ "stage2", "stage3", "stage4" ]
     norm: bn
     act: silu
+    weights: null
 
 neck:
     name: csppafpn
