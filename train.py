@@ -59,7 +59,7 @@ def main():
         model = torch.load(args.ckpt, map_location=torch.device('cpu'))
         #model.to(torch.device('cpu'))
         trainer = Trainer(
-            accelerator="cpu",
+            accelerator="gpu",
             devices=1,
             max_epochs=1,
             check_val_every_n_epoch=1,
@@ -67,12 +67,13 @@ def main():
             enable_progress_bar=True,
             logger=logger,
             callbacks=[checkpoint_callback],
+            detect_anomaly=True,
         )
 
         lightning = LitDetection(model, model_cfgs, data_cfgs, test_cfgs)
         lightning.to(torch.device('cpu'))
-        trainer.test(lightning, datamodule=data) #,
-
+        #trainer.test(lightning, datamodule=data) #,
+        trainer.validate(lightning, datamodule=data)
     # trainer.tune(lightning, datamodule=data)
     # trainer.validate(lightning, datamodule=data, ckpt_path='weights/al6/epoch=399-mAP=0.774.ckpt')
 

@@ -9,3 +9,4 @@ terminaltables
 numpy
 tqdm
 pyyaml
+tensorboard
