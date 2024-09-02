@@ -1,0 +1,44 @@
+# Parameters
+name: IDD
+datamodule: 'coco'
+
+dataset:
+    dir: '/mnt/13398a0c-baef-4d47-9340-6399c508a61d/Datasets/IDD/IDD_Detection/JPEGImages/'
+    train: ''  # directory name of training image
+    train_json: 'idd_train_annotations.json'
+    val: ''
+    val_json: 'idd_val_annotations.json'
+    test: ''
+    test_json: 'idd_val_annotations.json'
+    train_size: [608, 608]  # [224,224] [416,416] [640,640]
+    val_size: [608, 608]
+    train_batch_size: 16
+    val_batch_size: 16
+
+transform:
+    # Train transform
+    hsv_prob: 0.5
+    flip_prob: 0.5
+    # Mosaic transform
+    mosaic_prob: 0.9
+    mosaic_scale: [ 0.1, 2.0 ]
+    # Affine transform after mosaic
+    degrees: 0
+    translate: 0.1
+    shear: 2.0
+    perspective: 0.0
+    # mixup in mosaic (YOLOX)
+    mixup_prob: 1.0
+    mixup_scale: [ 0.5, 1.5 ]
+    # CopyPaste in mosaic
+    copypaste_prob: 0
+    copypaste_scale: [ 0.5, 1.5 ]
+    # CutPaste in mosaic
+    cutpaste_prob: 0
+    # Cutout rounding background
+    cutoutR_prob: 0
+
+num_classes: 15
+classes: [bicycle, bus, traffic_sign, motorcycle, car, traffic_light, person, vehicle_fallback, truck, autorickshaw, animal, rider, train, caravan, trailer] 
+#num_classes: 2
+#classes: [vehicle, pedestrian]
