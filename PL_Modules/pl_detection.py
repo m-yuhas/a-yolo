@@ -19,11 +19,14 @@ class LitDetection(LightningModule):
         super().__init__()
         self.validation_step_outputs = []
         self.model = model
-        self.model.backbone.to(self.device)
+        if self.model.backbone is not None:
+            self.model.backbone.to(self.device)
         if self.model.neck is not None:
             self.model.neck.to(self.device)
-        self.model.head.to(self.device)
-        self.model.loss.to(self.device)
+        if self.model.head is not None:
+            self.model.head.to(self.device)
+        if self.model.loss is not None:
+            self.model.loss.to(self.device)
         # Parameters for training
         self.co = model_cfgs['optimizer']
         self.cd = data_cfgs['dataset']

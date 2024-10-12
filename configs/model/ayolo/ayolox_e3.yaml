@@ -5,8 +5,8 @@ backbone:
     outputs: [ "stage1", "stage2", "stage3" ]
     norm: bn
     act: silu
-    weights: yolox608-idd-ood-full.pt
-    #weights: yolox608-idd-id-full.pt
+    weights: yolox608-carla-rain-full.pt
+    #weights: yolox608-carla-rain-full.pt
 
 neck:
     null

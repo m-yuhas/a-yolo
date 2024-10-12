@@ -73,10 +73,11 @@ class COCOTensorDataset(Dataset):
             img_file = os.path.join(self.data_dir, self.name, file_name)
             img = torch.load(img_file)
 
-        if self.preprocess is not None:
-            img, target = self.preprocess(img, res, self.img_size)
-        else:
-            target = res
+        #if self.preprocess is not None:
+        #    img, target = self.preprocess(img, res, self.img_size)
+        #else:
+        #    target = res
+        target = res
         #print(f"IMG: {img.shape}")
         #print(f"TARGET: {target}")
         #print(f"IMGHW: {img_hw}")
