@@ -1,16 +1,27 @@
-# Parameters
+# Indian Driving Dataset
+#
+# Description: Images gathered on Indian roads around Hyderabad.
+#
+# Provenance: Indian Institute of Technology, Hyderabad.
+#
+# Citation:
+# G. Varma, A. Subramanian, A. Namboodiri, M. Chandraker and C. V. Jawahar,
+# ``IDD: A Dataset for Exploring Problems of Autonomous Navigation in
+# Unconstrained Environments,'' 2019 IEEE Winter Conference on Applications of
+# Computer Vision (WACV), Waikoloa, HI, USA, 2019, pp. 1743-1751,
+# doi: 10.1109/WACV.2019.00190.
 name: IDD
 datamodule: 'coco'
 
 dataset:
     dir: '/mnt/13398a0c-baef-4d47-9340-6399c508a61d/Datasets/IDD/IDD_Detection/JPEGbright'
-    train: ''  # directory name of training image
+    train: ''
     train_json: 'idd_train_annotations.json'
     val: ''
     val_json: 'idd_val_annotations.json'
     test: ''
     test_json: 'idd_val_annotations.json'
-    train_size: [608, 608]  # [224,224] [416,416] [640,640]
+    train_size: [608, 608]
     val_size: [608, 608]
     train_batch_size: 16
     val_batch_size: 16
