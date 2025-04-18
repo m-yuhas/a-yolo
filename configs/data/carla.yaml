@@ -1,7 +1,7 @@
 # CARLA Object Detection
 #
 # Description: Vehicle and pedestrian bounding boxes gathered from CARLA
-# Simulator
+# Simulator.
 #
 # Provenance: RGB Images caputered @640x480, 30fps in CARLA Sim 0.9.13 from
 # town 10.  Bounding boxes were determined by finding the tightest box for a
@@ -10,8 +10,8 @@
 #
 # Citation:
 # A. Dosovitskiy, G. Ros, F. Codevilla, A. Lopez, and V. Koltun, ``CARLA: An
-# open urban driving simulator,'' Proceedings of the 1st Annual Conference on
-# Robot Learning, pp. 1--16, 2017.
+# open urban driving simulator,'' in Proceedings of the 1st Annual Conference
+# on Robot Learning, pp. 1--16, 2017.
 name: CARLA
 datamodule: 'coco'
 

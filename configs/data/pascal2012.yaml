@@ -1,5 +1,15 @@
-# Parameters
-name: COCO2017
+# PASCAL
+#
+# Description: The PASCAL object detection benchmark.
+#
+# Provenance: University of Leeds, KU Leuven, University of Edinburgh,
+# Microsoft Research, University of Oxford.
+#
+# Citation:
+# M. Everingham, L. Van Gool, C. K. I. Williams, J. Winn, and A. Zisserman,
+# ``The Pascal Visual Object Classes (VOC) Challenge,'' International Journal
+# of Computer Vision, vol. 88, no. 2, pp. 303--338, 2010.
+name: PASCAL
 datamodule: 'coco'
 
 dataset:

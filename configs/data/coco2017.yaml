@@ -1,16 +1,28 @@
-# Parameters
+# COCO
+#
+# Description: The 2017 edition of the Common Objects in COntext (COCO) dataset.
+#
+# Provenance: Cornell University, Toyotal Technological Institute, Microsoft
+# Research, Brown University, California Institue of Technology, and the
+# University of California, Irvine.
+#
+# Citation:
+# T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Dollár,
+# C. L. Zitnick, D. Fleet, T. Pajdla, B. Schiele, and T. Tuytelaars,
+# ``Microsooft COCO: Common Objects in Context,'' in Computer Vision -- ECCV
+# 2014, pp. 740--755, 2014, doi: 10.1007/978-3-319-10602-1_48.
 name: COCO2017
 datamodule: 'coco'
 
 dataset:
     dir: 'F:\Code\Datasets\Images\Detection\COCO2017'
-    train: 'train2017'  # directory name of training image
+    train: 'train2017'
     train_json: 'annotations_trainval2017\annotations\instances_train2017.json'
     val: 'val2017'
     val_json: 'annotations_trainval2017\annotations\instances_val2017.json'
     test: 'test'
     test_json: 'annotations/test.json'
-    train_size: [640,640]  # [224,224] [416,416] [640,640]
+    train_size: [640,640]
     val_size: [640,640]
     train_batch_size: 2
     val_batch_size: 2

@@ -5,10 +5,10 @@
 # Provenance: Indian Institute of Technology, Hyderabad.
 #
 # Citation:
-# G. Varma, A. Subramanian, A. Namboodiri, M. Chandraker and C. V. Jawahar,
+# G. Varma, A. Subramanian, A. Namboodiri, M. Chandraker, and C. V. Jawahar,
 # ``IDD: A Dataset for Exploring Problems of Autonomous Navigation in
-# Unconstrained Environments,'' 2019 IEEE Winter Conference on Applications of
-# Computer Vision (WACV), Waikoloa, HI, USA, 2019, pp. 1743-1751,
+# Unconstrained Environments,'' in 2019 IEEE Winter Conference on Applications
+# of Computer Vision (WACV), Waikoloa, HI, USA, 2019, pp. 1743-1751,
 # doi: 10.1109/WACV.2019.00190.
 name: IDD
 datamodule: 'coco'

@@ -1,16 +1,25 @@
-# Parameters
+# KITTI
+#
+# Description: Images from the roads around Karlsruhe, Germany.
+#
+# Provenance: Karslruhe Institute of Technology.
+#
+# Citation:
+# A. Geiger, P. Lenz, and R. Urtasun, ``Are we ready for Autonomous Driving?
+# The KITTI Vision Benchmark Suite,'' in Conference on Computer Vision and
+# Pattern Recognition (CVPR), 2012.
 name: KITTI
 datamodule: 'coco'
 
 dataset:
     dir: '/mnt/sdb/Datasets/Kitti2/'
-    train: 'train'  # directory name of training image
+    train: 'train'
     train_json: 'train_annotations.json'
     val: 'val'
     val_json: 'val_annotations.json'
     test: 'val'
     test_json: 'val_annotations.json'
-    train_size: [416,416]  # [224,224] [416,416] [640,640]
+    train_size: [416,416]
     val_size: [416,416]
     train_batch_size: 16
     val_batch_size: 16
